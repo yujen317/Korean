@@ -53,6 +53,12 @@
   .deckbar button{flex:none}
   .deckbar button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
   .deckbar button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dirbar{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:12px}
+  .dirbar button{flex:1;border:0;background:none;padding:8px;border-radius:9px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer}
+  .dirbar button.on{background:var(--ink);color:#fff}
+  .card .front.zh{font-family:"Noto Sans TC";color:var(--ink);font-size:36px}
+  .card .sub{font-size:22px;font-weight:700;margin-top:8px}
+  .card .sub.ko{font-family:"Noto Sans KR";color:var(--ko);cursor:pointer}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;min-height:280px;padding:28px 20px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;
     box-shadow:0 6px 24px rgba(60,40,20,.06);user-select:none}
@@ -88,6 +94,7 @@
 
   <div id="cards">
     <div class="deckbar" id="decks"></div>
+    <div class="dirbar" id="dirs"><button data-d="ko">韓 → 中</button><button data-d="zh">中 → 韓</button><button data-d="both">中韓對照</button></div>
     <div class="card" id="card"><div class="front" id="cFront"></div><div class="back"><div class="meaning" id="cMeaning"></div><div class="extra" id="cExtra"></div></div></div>
     <div class="row"><button class="again" id="bAgain">再看一次</button><button class="know" id="bKnow">記住了 ✓</button></div>
     <div class="stat"><span id="cStat"></span><span><button id="bSpeak">🔊 發音</button> · <button id="bReset">重設進度</button></span></div>
@@ -243,10 +250,24 @@ function next(){
     $('cMeaning').textContent = ''; $('cExtra').textContent = '';
     return;
   }
-  $('cFront').textContent = current.word;
-  $('cMeaning').textContent = current.meaning;
+  const f = $('cFront');
+  if (dir === 'zh'){
+    f.className = 'front zh'; f.textContent = current.meaning;
+    $('cMeaning').className = 'sub ko'; $('cMeaning').textContent = current.word;
+  } else if (dir === 'both'){
+    f.className = 'front'; f.innerHTML = current.word + '<div class="sub" style="font-family:Noto Sans TC;color:var(--ink)">' + current.meaning + '</div>';
+    $('cMeaning').className = 'meaning'; $('cMeaning').textContent = '';
+  } else {
+    f.className = 'front'; f.textContent = current.word;
+    $('cMeaning').className = 'meaning'; $('cMeaning').textContent = current.meaning;
+  }
   $('cExtra').innerHTML = current.ex ? '<div class="kx">' + current.ex + '</div><div>' + (HANGUL.test(current.exZh) ? '' : current.exZh) + '</div>' : '';
+  if (dir === 'both') $('card').classList.add('flipped');
 }
+let dir = store.get('ko-dir', 'ko');
+function drawDirs(){ document.querySelectorAll('#dirs button').forEach(b => b.classList.toggle('on', b.dataset.d === dir)); }
+document.querySelectorAll('#dirs button').forEach(b => b.onclick = () => { dir = b.dataset.d; store.set('ko-dir', dir); drawDirs(); if (current) queue.unshift(current); next(); });
+drawDirs();
 $('card').onclick = () => {
   if (!current) return;
   const c = $('card');
