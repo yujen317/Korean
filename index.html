@@ -781,6 +781,7 @@ function voice(p){
   try { if ('speechSynthesis' in window) speechSynthesis.cancel(); if (curAudio) { curAudio.pause(); curAudio = null; } } catch(e){}
   if (!p.audio) { speak(p.ko, null, true); return; }
   const a = new Audio(p.audio); curAudio = a;
+  a.addEventListener('loadedmetadata', () => { clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $('bubble').classList.remove('show'), Math.max(4500, a.duration * 1000 + 800)); });
   const pr = a.play();
   if (pr && pr.catch) pr.catch(() => { if (curAudio === a) speak(p.ko, null, true); });
 }
