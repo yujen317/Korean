@@ -73,6 +73,29 @@
   .row .again{color:var(--accent)} .row .know{background:var(--ok);border-color:var(--ok);color:#fff}
   .stat{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-top:12px}
   .stat button{border:0;background:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:14px;cursor:pointer}
+  /* mascot */
+  #mascot{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;width:108px;height:122px;cursor:pointer;filter:drop-shadow(0 4px 10px rgba(60,40,20,.18));
+    -webkit-tap-highlight-color:transparent}
+  #mascot svg{width:100%;height:100%;overflow:visible;animation:bob 2.6s ease-in-out infinite}
+  #mascot .earL{transform-origin:40px 34px;animation:earL 3.2s ease-in-out infinite}
+  #mascot .earR{transform-origin:62px 34px;animation:earR 3.2s ease-in-out infinite}
+  #mascot .paw{transform-origin:78px 70px;animation:wave 1.2s ease-in-out 3}
+  #mascot.hello .paw{animation:wave 1.2s ease-in-out 2}
+  #mascot .eye{transform-origin:center;transform-box:fill-box;animation:blink 4s infinite}
+  #mascot.hop svg{animation:hop .5s ease}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes earL{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
+  @keyframes earR{0%,100%{transform:rotate(0)}50%{transform:rotate(8deg)}}
+  @keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-25deg)}75%{transform:rotate(15deg)}}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+  @keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-16px) scale(1.04)}100%{transform:translateY(0)}}
+  #bubble{position:fixed;right:112px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:30;max-width:230px;background:var(--paper);
+    border:1px solid var(--line);border-radius:16px 16px 4px 16px;padding:10px 14px;box-shadow:0 6px 20px rgba(60,40,20,.12);
+    opacity:0;transform:translateY(8px) scale(.95);transition:opacity .3s,transform .3s;pointer-events:none}
+  #bubble.show{opacity:1;transform:none}
+  #bubble .k{font-family:"Noto Sans KR";font-weight:700;color:var(--ko);font-size:17px}
+  #bubble .z{font-size:13px;color:var(--muted)}
+  main{padding-bottom:140px}
   footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 </style>
 </head>
@@ -101,6 +124,26 @@
     <p class="hint">點卡片翻面看中文；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
   </div>
 </main>
+<div id="bubble"><div class="k" id="bK"></div><div class="z" id="bZ"></div></div>
+<div id="mascot" aria-label="點我聽韓文">
+<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="50" cy="108" rx="26" ry="4" fill="#000" opacity=".08"/>
+  <g class="earL"><ellipse cx="38" cy="20" rx="9" ry="22" fill="#fff" stroke="#e7d9cc" stroke-width="2"/><ellipse cx="38" cy="22" rx="4.5" ry="15" fill="#f7c9c0"/></g>
+  <g class="earR"><ellipse cx="64" cy="20" rx="9" ry="22" fill="#fff" stroke="#e7d9cc" stroke-width="2" transform="rotate(10 64 20)"/><ellipse cx="64" cy="22" rx="4.5" ry="15" fill="#f7c9c0" transform="rotate(10 64 22)"/></g>
+  <ellipse cx="50" cy="72" rx="34" ry="32" fill="#fff" stroke="#e7d9cc" stroke-width="2"/>
+  <ellipse cx="50" cy="86" rx="18" ry="12" fill="#fdf3ec"/>
+  <ellipse class="eye" cx="38" cy="66" rx="3.6" ry="4.4" fill="#2b2622"/>
+  <ellipse class="eye" cx="62" cy="66" rx="3.6" ry="4.4" fill="#2b2622"/>
+  <circle cx="39.3" cy="64.4" r="1.2" fill="#fff"/><circle cx="63.3" cy="64.4" r="1.2" fill="#fff"/>
+  <ellipse cx="30" cy="75" rx="6" ry="3.6" fill="#f7a8a0" opacity=".7"/>
+  <ellipse cx="70" cy="75" rx="6" ry="3.6" fill="#f7a8a0" opacity=".7"/>
+  <path d="M46 74 Q50 78 54 74" fill="none" stroke="#2b2622" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="50" cy="71.5" r="1.6" fill="#e0867a"/>
+  <ellipse cx="26" cy="88" rx="7" ry="6" fill="#fff" stroke="#e7d9cc" stroke-width="2"/>
+  <g class="paw"><ellipse cx="80" cy="64" rx="7" ry="8" fill="#fff" stroke="#e7d9cc" stroke-width="2"/></g>
+  <path d="M43 44 l7 -6 l7 6" fill="none" stroke="#c8553d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
 <footer>依「天天韓文 Daily Korean」系列分類整理 · 內容在 content.md，可直接在 GitHub 上編輯</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
@@ -278,6 +321,32 @@ $('bKnow').onclick = () => { if (!current) return; known[current.word] = 1; stor
 $('bAgain').onclick = () => { if (!current) return; queue.splice(Math.min(3, queue.length), 0, current); next(); };
 $('bSpeak').onclick = () => { if (current) speak(current.word); };
 $('bReset').onclick = () => { decks[deckIdx].cards.forEach(c => delete known[c.word]); store.set('ko-known', known); startDeck(); };
+
+/* ---------- mascot ---------- */
+// 打開網頁時的招呼語（想換句子就改這裡）
+const GREETING = { ko: '안녕하세요! 저랑 같이 한국어 공부해요!', zh: '你好！來跟我一起學習韓文吧！' };
+const PHRASES = [
+  { ko: '오늘도 화이팅!', zh: '今天也加油！' },
+  { ko: '잘하고 있어요!', zh: '你做得很好！' },
+  { ko: '조금만 더 힘내요!', zh: '再加油一下下！' },
+  { ko: '천천히 해도 괜찮아요.', zh: '慢慢來也沒關係。' },
+  { ko: '오늘 단어 다 외웠어요?', zh: '今天的單字都背了嗎？' },
+  { ko: '최고예요!', zh: '你最棒了！' }
+];
+let bubbleTimer = null, greeted = false, pi = 0;
+function say(p, withVoice){
+  $('bK').textContent = p.ko; $('bZ').textContent = p.zh;
+  $('bubble').classList.add('show');
+  clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $('bubble').classList.remove('show'), 4500);
+  if (withVoice) speak(p.ko);
+}
+$('mascot').onclick = () => {
+  const m = $('mascot'); m.classList.remove('hop'); void m.offsetWidth; m.classList.add('hop');
+  const p = greeted ? PHRASES[pi++ % PHRASES.length] : GREETING;
+  greeted = true; say(p, true);
+};
+// 開頁就打招呼（電腦會念出來；iPhone 不允許網頁自動發聲，點一下兔子就會念）
+setTimeout(() => say(GREETING, true), 700);
 
 /* ---------- mode switch ---------- */
 function setMode(cards){
