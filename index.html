@@ -270,6 +270,23 @@
   body.norom .rom{display:none}
   .card .rom{font-size:17px;text-align:center}
   .fsz button.rbtn{font-size:12px}
+
+  /* ---- foldable notes (easy reading on phones) ---- */
+  section.fold{background:var(--paper);border:1px solid var(--line);border-radius:18px;margin:14px 0;padding:0 14px;box-shadow:0 3px 12px rgba(232,112,138,.06)}
+  section.fold > h2{margin:0 !important;padding:16px 4px;cursor:pointer;position:relative;padding-right:34px !important;font-size:21px !important}
+  section.fold > h2::after{content:"＋";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:22px;color:var(--accent);font-family:system-ui}
+  section.fold:not(.closed) > h2::after{content:"－"}
+  section.fold.closed > .fbody{display:none}
+  section.fold > .fbody{padding-bottom:14px}
+  .sfold{border-top:1px dashed var(--line)}
+  .sfold > h3{margin:0 !important;padding:13px 30px 13px 2px;cursor:pointer;position:relative;font-size:17.5px !important}
+  .sfold > h3::after{content:"›";position:absolute;right:6px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:22px;color:#d0607b;transition:transform .2s}
+  .sfold.closed > h3::after{transform:translateY(-50%) rotate(0deg)}
+  .sfold.closed > .sbody{display:none}
+  .sfold > .sbody{padding-bottom:10px}
+  #notes > section.fold .tablewrap{box-shadow:none}
+  #toTop{position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--accent);font-size:20px;box-shadow:0 4px 12px rgba(60,40,20,.12);display:none;cursor:pointer}
+  #toTop.show{display:block}
 </style>
 </head>
 <body>
@@ -309,6 +326,7 @@
     <div class="clist"><h4>這組單字清單 <span id="clistStat" class="kz"></span></h4><div class="wgrid" id="clist"></div></div>
   </div>
 </main>
+<button id="toTop" type="button" aria-label="回到頂端">↑</button>
 <div id="bubble"><div class="k" id="bK"></div><div class="z" id="bZ"></div></div>
 <div id="mascot" aria-label="點我聽韓文">
 <svg viewBox="0 0 106 116" xmlns="http://www.w3.org/2000/svg">
@@ -419,6 +437,29 @@ function wrapSections(){
     if (n.nodeName === 'H2'){ cur = document.createElement('section'); notes.insertBefore(cur, n); }
     if (cur) cur.appendChild(n);
   });
+  // 手機好讀：每一大段、每一小段都可以收合
+  notes.querySelectorAll('section').forEach(sec => {
+    sec.classList.add('fold', 'closed');
+    const h2 = sec.querySelector('h2');
+    const body = document.createElement('div'); body.className = 'fbody';
+    [...sec.childNodes].forEach(n => { if (n !== h2) body.appendChild(n); });
+    sec.appendChild(body);
+    // 小段（h3）
+    let sub = null;
+    [...body.childNodes].forEach(n => {
+      if (n.nodeName === 'H3'){ sub = document.createElement('div'); sub.className = 'sfold closed'; body.insertBefore(sub, n); const b = document.createElement('div'); b.className = 'sbody'; sub.appendChild(n); sub.appendChild(b); return; }
+      if (sub) sub.querySelector('.sbody').appendChild(n);
+    });
+  });
+  notes.addEventListener('click', e => {
+    const h2 = e.target.closest('section.fold > h2'); if (h2){ h2.parentNode.classList.toggle('closed'); return; }
+    const h3 = e.target.closest('.sfold > h3'); if (h3){ h3.parentNode.classList.toggle('closed'); }
+  });
+}
+function openTo(id){
+  const el = document.getElementById(id); if (!el) return;
+  const sec = el.closest('section.fold'); if (sec) sec.classList.remove('closed');
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 30);
 }
 
 function markKorean(){
@@ -432,7 +473,7 @@ function buildToc(){
   notes.querySelectorAll('h2').forEach((h, i) => {
     h.id = 's' + i;
     const a = document.createElement('a');
-    a.href = '#s' + i;
+    a.href = '#s' + i; a.onclick = ev => { ev.preventDefault(); openTo('s' + i); };
     a.textContent = h.textContent.replace(/^單字[：:]/, '單字·').replace(/（(第[^）]*|\d+ 個|由淺入深|規則|課堂筆記)）/g, '').replace(/名詞（(.+?)）/, '$1').trim();
     toc.appendChild(a);
   });
@@ -509,6 +550,8 @@ document.getElementById('q').addEventListener('input', e => {
     });
     if (q && sec.textContent.toLowerCase().includes(q)) any = true;
     sec.classList.toggle('hide', !any);
+    sec.classList.toggle('closed', !q);
+    sec.querySelectorAll('.sfold').forEach(f => f.classList.toggle('closed', !q || !f.textContent.toLowerCase().includes(q)));
   });
 });
 
@@ -856,6 +899,12 @@ function addRom(root){
   const b = document.getElementById('romBtn'); b.classList.toggle('on', on);
   b.addEventListener('click', () => { const v = document.body.classList.toggle('norom'); store.set('ko-rom', !v); b.classList.toggle('on', !v); });
 })();
+
+
+/* back to top */
+(() => { const b = document.getElementById('toTop');
+  window.addEventListener('scroll', () => b.classList.toggle('show', window.scrollY > 600), { passive: true });
+  b.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' }); })();
 
 /* ---------- mode switch ---------- */
 function setMode(m){
