@@ -370,6 +370,25 @@
   a{color:var(--gold2)}
   .tablewrap{box-shadow:none !important}
   #mascot{filter:drop-shadow(0 0 10px rgba(201,164,92,.35)) drop-shadow(0 4px 10px rgba(0,0,0,.5)) !important}
+
+  .cmp table{font-size:15px}
+  .cmp td{white-space:nowrap}
+  .cmp td:first-child{font-weight:700}
+  .cmp td .m{display:block;font-size:12.5px;color:var(--muted);font-weight:400;white-space:normal}
+  @media (min-width: 601px){ .cmp{overflow-x:auto} }
+
+  /* 時態比較表：手機上也保持表格，左右滑動，第一欄固定 */
+  @media (max-width: 600px){
+    .tablewrap.cmp{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .tablewrap.cmp table{display:table;width:max-content;min-width:100%}
+    .tablewrap.cmp thead{display:table-header-group}
+    .tablewrap.cmp tbody{display:table-row-group}
+    .tablewrap.cmp tr{display:table-row;padding:0}
+    .tablewrap.cmp td,.tablewrap.cmp th{display:table-cell;padding:9px 12px;border-bottom:1px solid var(--line) !important;font-size:15.5px !important}
+    .tablewrap.cmp td::before{display:none !important}
+  }
+  .tablewrap.cmp td:first-child,.tablewrap.cmp th:first-child{position:sticky;left:0;background:var(--paper2) !important;z-index:1;box-shadow:2px 0 6px rgba(0,0,0,.25)}
+  .cmp-hint{font-size:13.5px;color:var(--muted);margin:4px 0 8px}
 </style>
 </head>
 <body>
@@ -898,7 +917,34 @@ const verbsEl = document.getElementById('verbs');
 function esc(t){ return t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function renderVerbs(){
   if (typeof VERBS === 'undefined') { verbsEl.innerHTML = '<p>找不到 verbs.js。</p>'; return; }
-  let h = marked.parse(VERB_INTRO);
+  // 時態：由 해요 形、ㄹ까요 形、고 形推出
+  const pastOf = f => { const st = f.slice(0, -1), last = st.slice(-1), c = last.charCodeAt(0) - 0xAC00; return st.slice(0, -1) + String.fromCharCode(0xAC00 + c - (c % 28) + 20) + '어요'; };
+  const futOf = f => f.replace(/까요$/, ' 거예요');
+  const progOf = f => f + ' 있어요';
+  const negOf = f => '안 ' + f;
+  const TENSE = `## 時態分類
+
+先把時態分清楚：同一個動詞，換不同結尾就表示不同時間。
+
+| 時態 | 接法 | 例句 | 中文 |
+| --- | --- | --- | --- |
+| 現在 | -아요/어요 | 저는 밥을 먹어요. | 我吃飯。 |
+| 過去 | -았/었어요 | 어제 밥을 먹었어요. | 昨天吃了飯。 |
+| 未來／打算 | -(으)ㄹ 거예요 | 내일 밥을 먹을 거예요. | 明天要吃飯。 |
+| 正在進行 | -고 있어요 | 지금 밥을 먹고 있어요. | 現在正在吃飯。 |
+| 經驗 | -아/어 봤어요 | 김치를 먹어 봤어요. | 吃過泡菜。 |
+| 否定 | 안 ＋現在式 | 아침을 안 먹어요. | 不吃早餐。 |
+| 正式 | -(스)ㅂ니다 | 매일 아침을 먹습니다. | 每天吃早餐。 |
+
+## 時態比較表
+
+30 個動詞的時態放在一起比較。`;
+  const CMPHINT = '<p class="cmp-hint">表格可以左右滑動，最左邊的動詞會固定不動。</p>';
+  let h = marked.parse(TENSE);
+  h += CMPHINT + '<div class="tablewrap cmp"><table><thead><tr><th>動詞</th><th>現在</th><th>過去</th><th>未來</th><th>進行</th><th>否定</th><th>正式</th></tr></thead><tbody>'
+    + VERBS.map(v => { const f = v[3]; return '<tr><td>' + v[0] + '<span class="m">' + esc(v[1]) + '</span></td><td>' + f[0] + '</td><td>' + pastOf(f[0]) + '</td><td>' + futOf(f[1]) + '</td><td>' + progOf(f[4]) + '</td><td>' + negOf(f[0]) + '</td><td>' + f[7] + '</td></tr>'; }).join('')
+    + '</tbody></table></div>';
+  h += marked.parse(VERB_INTRO);
   h += '<div class="vchips">' + VERBS.map((v, i) => '<a href="#v' + i + '">' + v[0] + '</a>').join('') + '</div>';
   VERBS.forEach((v, i) => {
     const [w, zh, note, forms, ex] = v;
