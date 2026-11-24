@@ -204,6 +204,26 @@
 
   .spk{border:0;background:#fde7ee;color:#c0506d;border-radius:999px;font-size:12px;line-height:1;padding:4px 6px;margin-left:5px;cursor:pointer;vertical-align:2px;-webkit-tap-highlight-color:transparent}
   .spk:active{background:#f7b8c8}
+
+  /* ---- mobile: tables become stacked cards so nothing is squeezed ---- */
+  @media (max-width: 600px){
+    body{font-size:15.5px}
+    main{padding-left:14px;padding-right:14px}
+    .tablewrap table, .tablewrap tbody, .tablewrap tr, .tablewrap td{display:block;width:auto}
+    .tablewrap thead{display:none}
+    .tablewrap tr{padding:12px 14px;border-bottom:1px solid var(--line)}
+    .tablewrap tr:last-child{border-bottom:0}
+    .tablewrap td{border:0;padding:2px 0;line-height:1.6}
+    .tablewrap td[data-label]::before{content:attr(data-label);display:inline-block;min-width:4.2em;margin-right:8px;font-size:12px;color:var(--muted);font-family:"Noto Sans TC";font-weight:500;vertical-align:1px}
+    .tablewrap td:first-child{font-size:17px;font-weight:700;padding-bottom:4px}
+    .tablewrap td:first-child::before{display:none}
+    .vcard .tablewrap td:first-child{font-size:16px}
+    #mascot{width:72px;height:82px;right:8px}
+    #bubble{right:78px;bottom:calc(58px + env(safe-area-inset-bottom));max-width:210px}
+    .whead{padding:12px 14px}
+    .wbody{padding:4px 14px 12px}
+    .wgrid{column-gap:10px}
+  }
 </style>
 </head>
 <body>
@@ -674,6 +694,16 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 
+
+/* ---------- label each cell with its column name (used by the mobile card layout) ---------- */
+function labelCells(root){
+  root.querySelectorAll('table').forEach(t => {
+    const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    if (!heads.length) return;
+    t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => { if (heads[i]) td.dataset.label = heads[i]; }));
+  });
+}
+
 /* ---------- speaker buttons after Korean text ---------- */
 function addSpk(root){
   root.querySelectorAll('td.ko, .chk .kw, .vhead .vw').forEach(el => {
@@ -706,7 +736,7 @@ $('mCards').onclick = () => setMode('cards');
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
   .then(([md, dmd, bmd]) => {
-    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); addSpk(document);
+    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document);
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
