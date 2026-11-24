@@ -201,6 +201,9 @@
 
   .playall{margin-left:8px;border:0;background:var(--accent);color:#fff;border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;cursor:pointer;vertical-align:1px}
   .intro{background:#fff8e1;border-radius:12px;padding:4px 12px 10px;margin-bottom:6px}
+
+  .spk{border:0;background:#fde7ee;color:#c0506d;border-radius:999px;font-size:12px;line-height:1;padding:4px 6px;margin-left:5px;cursor:pointer;vertical-align:2px;-webkit-tap-highlight-color:transparent}
+  .spk:active{background:#f7b8c8}
 </style>
 </head>
 <body>
@@ -661,6 +664,17 @@ window.addEventListener('scroll', () => {
   lastY = y;
 }, { passive: true });
 
+
+/* ---------- speaker buttons after Korean text ---------- */
+function addSpk(root){
+  root.querySelectorAll('td.ko, .chk .kw, .vhead .vw').forEach(el => {
+    if (el.querySelector(':scope > .spk')) return;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'spk'; b.textContent = '🔊'; b.setAttribute('aria-label', '發音');
+    const sub = el.querySelector(':scope > .m, :scope > .zh');
+    sub ? el.insertBefore(b, sub) : el.appendChild(b);
+  });
+}
+
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
@@ -683,7 +697,7 @@ $('mCards').onclick = () => setMode('cards');
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
   .then(([md, dmd, bmd]) => {
-    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek();
+    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); addSpk(document);
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
