@@ -485,10 +485,24 @@
 </div>
 <footer>依「天天韓文 Daily Korean」系列分類整理 · 內容在 content.md，可直接在 GitHub 上編輯</footer>
 
+<script>
+// 自動更新：網頁會檢查 version.txt，有新版本就自己重新載入（不用重新加入主畫面）
+const APP_VERSION = '202611242048';
+(function(){
+  function check(){
+    fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => {
+      v = (v || '').trim();
+      if (v && v !== APP_VERSION) location.replace(location.pathname + '?v=' + v + location.hash);
+    }).catch(() => {});
+  }
+  check();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
-<script src="verbs.js"></script>
-<script src="weekly.js"></script>
-<script src="roman.js"></script>
+<script src="verbs.js?v=202611242048"></script>
+<script src="weekly.js?v=202611242048"></script>
+<script src="roman.js?v=202611242048"></script>
 <script>
 const HANGUL = /[가-힣]/;
 const store = {
