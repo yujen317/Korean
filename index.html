@@ -262,6 +262,9 @@
   .fsz{display:flex;gap:4px;margin-left:auto;align-items:center}
   .fsz button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:4px 9px;font:inherit;color:var(--ink);cursor:pointer}
   .fsz button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  #gram h2{font-family:"Jua","Noto Sans TC",sans-serif;font-weight:400;font-size:26px;color:#4a3a44;margin:30px 0 8px;scroll-margin-top:120px}
+  #gram h3{font-size:19px;color:#d0607b;margin:22px 0 6px}
 </style>
 </head>
 <body>
@@ -275,6 +278,7 @@
       <button id="mDaily">每日</button>
       <button id="mWeek">每週</button>
       <button id="mNotes">筆記</button>
+      <button id="mGram">文法</button>
       <button id="mVerbs">動詞</button>
       <button id="mBook">課本</button>
   </div>
@@ -286,6 +290,7 @@
   <div id="notes"><p class="hint">載入中…</p></div>
   <div id="week" style="display:none"></div>
   <div id="verbs" style="display:none"></div>
+  <div id="gram" style="display:none"></div>
   <div id="textbook" style="display:none"></div>
   <div id="daily" style="display:none"><p class="hint">載入中…</p></div>
 
@@ -710,6 +715,25 @@ weekEl.addEventListener('change', e => {
   updBar(parseInt(c.dataset.k));
 });
 
+
+/* ---------- grammar summary page ---------- */
+const gramEl = document.getElementById('gram');
+function renderGram(md){
+  gramEl.innerHTML = marked.parse(md);
+  const hs = [...gramEl.querySelectorAll('h2')]; hs.forEach((h, i) => h.id = 'g' + i);
+  const nav = document.createElement('div'); nav.className = 'bchips';
+  nav.innerHTML = hs.map(h => '<a href="#' + h.id + '">' + h.textContent.replace(/（.*?）/, '') + '</a>').join('');
+  gramEl.prepend(nav);
+  gramEl.querySelectorAll('table').forEach(t => {
+    const w = document.createElement('div'); w.className = 'tablewrap'; t.parentNode.insertBefore(w, t); w.appendChild(t);
+    const heads = [...t.querySelectorAll('th')].map(th => th.textContent.trim());
+    t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => {
+      if (HANGUL.test(td.textContent) && !/中文|意思|規則|感覺|對象|用在|方向/.test(heads[i] || '') && !/[\u4e00-\u9fff]{4,}/.test(td.textContent)) td.classList.add('ko');
+    }));
+  });
+}
+gramEl.addEventListener('click', e => { const td = e.target.closest('td.ko'); if (td) speak(td.textContent, td); });
+
 /* ---------- textbook page ---------- */
 const bookEl = document.getElementById('textbook');
 function renderBook(md){
@@ -809,6 +833,7 @@ function addSpk(root){
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
+  $('mGram').classList.toggle('on', m === 'gram'); gramEl.style.display = m === 'gram' ? '' : 'none';
   $('mWeek').classList.toggle('on', m === 'week'); weekEl.style.display = m === 'week' ? '' : 'none';
   $('mBook').classList.toggle('on', m === 'book'); bookEl.style.display = m === 'book' ? '' : 'none';
   $('mVerbs').classList.toggle('on', m === 'verbs'); verbsEl.style.display = m === 'verbs' ? '' : 'none';
@@ -822,17 +847,19 @@ $('mNotes').onclick = () => setMode('notes');
 $('mDaily').onclick = () => setMode('daily');
 $('mVerbs').onclick = () => setMode('verbs');
 $('mBook').onclick = () => setMode('book');
+$('mGram').onclick = () => setMode('gram');
 $('mWeek').onclick = () => { setMode('week'); const c = document.querySelector('.wcard.now'); if (c) c.scrollIntoView(); };
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
-Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
-  .then(([md, dmd, bmd]) => {
-    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document);
+Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => ''), get('grammar.md').catch(() => '')])
+  .then(([md, dmd, bmd, gmd]) => {
+    renderDaily(dmd); renderBook(bmd); renderGram(gmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document);
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
     else if (/book/.test(location.hash)) setMode('book');
+    else if (/gram/.test(location.hash)) setMode('gram');
     else if (/week/.test(location.hash)) setMode('week');
     else if (/notes/.test(location.hash)) setMode('notes');
     else { setMode('cards'); }
