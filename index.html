@@ -528,6 +528,15 @@ $('mascot').onclick = () => {
 };
 // 開頁就打招呼（電腦會念出來；iPhone 不允許網頁自動發聲，點一下兔子就會念）
 setTimeout(() => say(GREETING, true), 700);
+// iPhone／多數瀏覽器規定：網頁要等使用者碰一下畫面才能發出聲音。
+// 所以第一次碰到畫面（點、滑都算）時，公仔就馬上用男聲打招呼。
+let greetedAloud = false;
+['touchstart','pointerdown','keydown'].forEach(ev => document.addEventListener(ev, function once(e){
+  if (greetedAloud) return; greetedAloud = true;
+  const t = e.target && e.target.closest && e.target.closest('.spk, .ko, .kw, #mascot, #card, .playall, #bSpeak');
+  if (t) return; // 這一下本來就要念別的東西，就不搶著打招呼
+  say(GREETING, true);
+}, { once: true, passive: true }));
 
 
 
