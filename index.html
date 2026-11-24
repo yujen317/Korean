@@ -131,6 +131,23 @@
   .deckbar button.on{background:var(--accent);border-color:var(--accent)}
   #bubble{border-color:#fbd3de;border-radius:18px 18px 4px 18px}
   #bubble .k{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;font-size:19px}
+
+  /* verbs page */
+  .mode button{padding:6px 10px}
+  #verbs h2{font-family:"Jua","Noto Sans TC",sans-serif;font-weight:400;font-size:24px;display:flex;align-items:center;gap:8px;color:#4a3a44;margin:30px 0 10px}
+  .vchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
+  .vchips a{font-family:"Noto Sans KR";font-size:14px;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ko);text-decoration:none}
+  .vcard{background:var(--paper);border:1px solid var(--line);border-radius:18px;margin:16px 0;overflow:hidden;box-shadow:0 3px 12px rgba(232,112,138,.08);scroll-margin-top:110px}
+  .vhead{background:#fde7ee;padding:12px 16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .vhead .vw{font-family:"Jua","Noto Sans KR";font-size:28px;color:#3a2f35;cursor:pointer}
+  .vhead .vz{font-size:17px;font-weight:700}
+  .vhead .vn{flex-basis:100%;font-size:13px;color:#c0506d}
+  .vforms{padding:10px 16px 6px;font-family:"Noto Sans KR";color:#e2873a;font-weight:600;font-size:15px;line-height:1.9}
+  .vforms span,.vforms span.ko{cursor:pointer;color:#e2873a}
+  .vcard table{font-size:14px}
+  .vcard td.f{white-space:nowrap;font-weight:700}
+  .vcard .m{font-size:12px;color:var(--muted);display:block;font-weight:400;font-family:"Noto Sans TC"}
+  .vcard .zh{display:block;font-size:13px;color:var(--muted);font-family:"Noto Sans TC"}
 </style>
 </head>
 <body>
@@ -139,6 +156,7 @@
     <div class="brand"><span class="kbrand">한국어 노트</span><small>韓文學習筆記</small></div>
     <div class="mode">
       <button id="mNotes" class="on">筆記</button>
+      <button id="mVerbs">動詞</button>
       <button id="mDaily">每日</button>
       <button id="mCards">單字卡</button>
     </div>
@@ -149,6 +167,7 @@
 
 <main>
   <div id="notes"><p class="hint">載入中…</p></div>
+  <div id="verbs" style="display:none"></div>
   <div id="daily" style="display:none"><p class="hint">載入中…</p></div>
 
   <div id="cards">
@@ -218,6 +237,7 @@
 <footer>依「天天韓文 Daily Korean」系列分類整理 · 內容在 content.md，可直接在 GitHub 上編輯</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script src="verbs.js"></script>
 <script>
 const HANGUL = /[가-힣]/;
 const store = {
@@ -440,9 +460,38 @@ $('mascot').onclick = () => {
 // 開頁就打招呼（電腦會念出來；iPhone 不允許網頁自動發聲，點一下兔子就會念）
 setTimeout(() => say(GREETING, true), 700);
 
+
+/* ---------- verbs page ---------- */
+const verbsEl = document.getElementById('verbs');
+function esc(t){ return t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function renderVerbs(){
+  if (typeof VERBS === 'undefined') { verbsEl.innerHTML = '<p>找不到 verbs.js。</p>'; return; }
+  let h = marked.parse(VERB_INTRO);
+  h += '<div class="vchips">' + VERBS.map((v, i) => '<a href="#v' + i + '">' + v[0] + '</a>').join('') + '</div>';
+  VERBS.forEach((v, i) => {
+    const [w, zh, note, forms, ex] = v;
+    h += '<div class="vcard" id="v' + i + '"><div class="vhead"><span class="vw ko">' + w + '</span><span class="vz">' + esc(zh) + '</span>' + (note ? '<span class="vn">' + esc(note) + '</span>' : '') + '</div>';
+    h += '<div class="vforms">' + forms.map(f => '<span class="ko">' + f + '</span>').join(' / ') + '</div>';
+    h += '<div class="tablewrap" style="margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none"><table><thead><tr><th>變化</th><th>例句</th></tr></thead><tbody>';
+    forms.forEach((f, j) => {
+      h += '<tr><td class="f ko">' + f + '<span class="m">' + FORMS[j][1] + '</span></td><td class="ko">' + esc(ex[j][0]) + '<span class="zh">' + esc(ex[j][1]) + '</span></td></tr>';
+    });
+    h += '</tbody></table></div></div>';
+  });
+  verbsEl.innerHTML = h;
+  verbsEl.querySelectorAll('table').forEach(t => { if (!t.closest('.tablewrap')) { const w = document.createElement('div'); w.className = 'tablewrap'; t.parentNode.insertBefore(w, t); w.appendChild(t); } });
+  verbsEl.querySelectorAll('.tablewrap td').forEach(td => { if (HANGUL.test(td.textContent)) td.classList.add('ko'); });
+}
+verbsEl.addEventListener('click', e => {
+  const el = e.target.closest('.ko'); if (!el) return;
+  const t = el.cloneNode(true); t.querySelectorAll('.m,.zh').forEach(x => x.remove());
+  speak(t.textContent, el);
+});
+
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
+  $('mVerbs').classList.toggle('on', m === 'verbs'); verbsEl.style.display = m === 'verbs' ? '' : 'none';
   $('mNotes').classList.toggle('on', m === 'notes'); $('mDaily').classList.toggle('on', m === 'daily'); $('mCards').classList.toggle('on', m === 'cards');
   notes.style.display = m === 'notes' ? '' : 'none'; daily.style.display = m === 'daily' ? '' : 'none';
   $('cards').style.display = m === 'cards' ? 'block' : 'none';
@@ -451,14 +500,16 @@ function setMode(m){
 }
 $('mNotes').onclick = () => setMode('notes');
 $('mDaily').onclick = () => setMode('daily');
+$('mVerbs').onclick = () => setMode('verbs');
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。')])
   .then(([md, dmd]) => {
-    renderDaily(dmd); render(md);
+    renderDaily(dmd); render(md); renderVerbs();
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
+    else if (/verbs/.test(location.hash)) setMode('verbs');
   })
   .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
 </script>
