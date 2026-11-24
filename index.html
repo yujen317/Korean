@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>韓文學習筆記｜韓檢初級單字與句型</title>
+<meta name="theme-color" content="#f6f1ea">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1ea; --paper:#fffdf9; --ink:#2b2622; --muted:#7a6f66; --line:#e6ddd2;
+    --accent:#c8553d; --accent-soft:#f6e3dc; --ko:#1f4e79; --ok:#3f7d58;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:110px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.7 "Noto Sans TC","Noto Sans KR",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+  header{position:sticky;top:0;z-index:20;background:rgba(246,241,234,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 16px 8px}
+  .top{display:flex;gap:8px;align-items:center;max-width:960px;margin:0 auto}
+  .brand{font-weight:700;font-size:17px;white-space:nowrap}
+  .brand span{color:var(--accent)}
+  .mode{margin-left:auto;display:flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .mode button{border:0;background:none;padding:6px 12px;border-radius:999px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer}
+  .mode button.on{background:var(--ink);color:#fff}
+  .tools{max-width:960px;margin:8px auto 0;display:flex;gap:8px}
+  #q{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit;font-size:15px}
+  nav#toc{max-width:960px;margin:8px auto 0;display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  nav#toc::-webkit-scrollbar{display:none}
+  nav#toc a{flex:none;font-size:13px;padding:4px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line);color:var(--ink);text-decoration:none;white-space:nowrap}
+  nav#toc a:hover{border-color:var(--accent)}
+  main{max-width:960px;margin:0 auto;padding:12px 16px 80px}
+  #notes h1{font-size:26px;margin:18px 0 6px}
+  #notes h2{font-size:21px;margin:36px 0 10px;padding-left:10px;border-left:4px solid var(--accent)}
+  #notes h3{font-size:17px;margin:26px 0 8px;color:var(--accent)}
+  #notes p,#notes li{max-width:70ch}
+  .tablewrap{overflow-x:auto;margin:10px 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#f1e9df;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap}
+  tr:last-child td{border-bottom:0}
+  .ko{color:var(--ko);font-family:"Noto Sans KR",sans-serif;cursor:pointer;border-radius:4px}
+  .ko:hover{background:#e7eef6}
+  .ko.speaking{background:#d6e4f2}
+  tr.hide{display:none}
+  section.hide{display:none}
+  .hint{font-size:13px;color:var(--muted)}
+  /* flashcards */
+  #cards{display:none}
+  .deckbar{display:flex;gap:6px;margin:14px 0;overflow-x:auto;scrollbar-width:none}
+  .deckbar::-webkit-scrollbar{display:none}
+  .deckbar button{flex:none}
+  .deckbar button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+  .deckbar button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;min-height:280px;padding:28px 20px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;
+    box-shadow:0 6px 24px rgba(60,40,20,.06);user-select:none}
+  .card .front{font-family:"Noto Sans KR";font-size:44px;font-weight:700;color:var(--ko);line-height:1.2}
+  .card .back{margin-top:16px;display:none}
+  .card.flipped .back{display:block}
+  .card .meaning{font-size:24px;font-weight:700}
+  .card .extra{margin-top:10px;color:var(--muted);font-size:15px}
+  .card .extra .kx{font-family:"Noto Sans KR";color:var(--ko)}
+  .row{display:flex;gap:10px;margin-top:14px}
+  .row button{flex:1;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);font:inherit;font-size:16px;cursor:pointer}
+  .row .again{color:var(--accent)} .row .know{background:var(--ok);border-color:var(--ok);color:#fff}
+  .stat{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-top:12px}
+  .stat button{border:0;background:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:14px;cursor:pointer}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">韓文<span>學習</span>筆記</div>
+    <div class="mode">
+      <button id="mNotes" class="on">筆記</button>
+      <button id="mCards">單字卡</button>
+    </div>
+  </div>
+  <div class="tools" id="searchbar"><input id="q" type="search" placeholder="搜尋韓文或中文，例如：먹다、喝、까지"></div>
+  <nav id="toc"></nav>
+</header>
+
+<main>
+  <div id="notes"><p class="hint">載入中…</p></div>
+
+  <div id="cards">
+    <div class="deckbar" id="decks"></div>
+    <div class="card" id="card"><div class="front" id="cFront"></div><div class="back"><div class="meaning" id="cMeaning"></div><div class="extra" id="cExtra"></div></div></div>
+    <div class="row"><button class="again" id="bAgain">再看一次</button><button class="know" id="bKnow">記住了 ✓</button></div>
+    <div class="stat"><span id="cStat"></span><span><button id="bSpeak">🔊 發音</button> · <button id="bReset">重設進度</button></span></div>
+    <p class="hint">點卡片翻面看中文；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
+  </div>
+</main>
+<footer>依「天天韓文 Daily Korean」系列分類整理 · 內容在 content.md，可直接在 GitHub 上編輯</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script>
+const HANGUL = /[가-힣]/;
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---------- speech ---------- */
+let koVoice = null;
+function pickVoice(){
+  try{ const vs = speechSynthesis.getVoices(); koVoice = vs.find(v => /ko(-|_)KR/i.test(v.lang)) || vs.find(v => /^ko/i.test(v.lang)) || null; }catch(e){}
+}
+if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function koOnly(t){
+  // keep Hangul, digits, spaces and basic punctuation; drop Chinese notes
+  return t.replace(/[（(][^）)]*[）)]/g,' ').replace(/[^가-힣ㄱ-ㆎ0-9 ,.?!~\-\/]/g,' ').replace(/\s+/g,' ').trim();
+}
+function speak(text, el){
+  if (!('speechSynthesis' in window)) return;
+  const t = koOnly(text); if (!t) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'ko-KR'; u.rate = 0.85; if (koVoice) u.voice = koVoice;
+    if (el){ el.classList.add('speaking'); u.onend = u.onerror = () => el.classList.remove('speaking'); }
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- notes ---------- */
+const notes = document.getElementById('notes');
+const toc = document.getElementById('toc');
+let decks = [];
+
+function wrapSections(){
+  // group each h2 + following nodes into a <section>
+  const nodes = [...notes.childNodes];
+  let cur = null;
+  nodes.forEach(n => {
+    if (n.nodeName === 'H2'){ cur = document.createElement('section'); notes.insertBefore(cur, n); }
+    if (cur) cur.appendChild(n);
+  });
+}
+
+function markKorean(){
+  notes.querySelectorAll('td').forEach(td => {
+    if (HANGUL.test(td.textContent)){ td.classList.add('ko'); td.title = '點一下聽發音'; }
+  });
+}
+
+function buildToc(){
+  toc.innerHTML = '';
+  notes.querySelectorAll('h2').forEach((h, i) => {
+    h.id = 's' + i;
+    const a = document.createElement('a');
+    a.href = '#s' + i;
+    a.textContent = h.textContent.replace(/^(句法.)[：:]/, '$1·').replace(/^單字[：:]/, '').replace(/（[^）]*個）/, '').trim();
+    toc.appendChild(a);
+  });
+}
+
+function buildDecks(){
+  decks = [];
+  notes.querySelectorAll('section').forEach(sec => {
+    const h = sec.querySelector('h2'); if (!h) return;
+    const title = h.textContent;
+    const cards = [];
+    sec.querySelectorAll('table').forEach(tb => {
+      const heads = [...tb.querySelectorAll('th')].map(th => th.textContent.trim());
+      tb.querySelectorAll('tbody tr').forEach(tr => {
+        const tds = [...tr.children].map(td => td.textContent.trim());
+        const ki = tds.findIndex(t => HANGUL.test(t));
+        if (ki < 0 || ki + 1 >= tds.length) return;
+        const word = tds[ki].replace(/[※]|〔連〕/g,'').trim();
+        const meaning = tds[ki + 1];
+        if (HANGUL.test(meaning)) return; // skip grammar rows where next col is also Korean
+        const exIdx = heads.findIndex(x => x === '例句' || x === '例子');
+        const ex = exIdx > -1 ? tds[exIdx] : '';
+        const exZh = exIdx > -1 && tds[exIdx + 1] ? tds[exIdx + 1] : '';
+        cards.push({ word, meaning, ex, exZh });
+      });
+    });
+    if (cards.length >= 5 && /^單字/.test(title)) decks.push({ title: title.replace(/^單字[：:]/,'').replace(/（[^）]*個）/,'').trim(), cards });
+  });
+}
+
+function render(md){
+  notes.innerHTML = marked.parse(md);
+  notes.querySelectorAll('table').forEach(t => {
+    const w = document.createElement('div'); w.className = 'tablewrap';
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  wrapSections(); markKorean(); buildToc(); buildDecks(); drawDecks();
+}
+
+notes.addEventListener('click', e => {
+  const td = e.target.closest('td.ko'); if (td) speak(td.textContent, td);
+});
+
+/* ---------- search ---------- */
+document.getElementById('q').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  notes.querySelectorAll('section').forEach(sec => {
+    let any = !q;
+    sec.querySelectorAll('tbody tr').forEach(tr => {
+      const hit = !q || tr.textContent.toLowerCase().includes(q);
+      tr.classList.toggle('hide', !hit); if (hit) any = true;
+    });
+    if (q && sec.textContent.toLowerCase().includes(q)) any = true;
+    sec.classList.toggle('hide', !any);
+  });
+});
+
+/* ---------- flashcards ---------- */
+let deckIdx = 0, queue = [], current = null;
+const known = store.get('ko-known', {});
+const $ = id => document.getElementById(id);
+
+function drawDecks(){
+  const bar = $('decks'); bar.innerHTML = '';
+  decks.forEach((d, i) => {
+    const b = document.createElement('button');
+    b.textContent = d.title + '（' + d.cards.length + '）';
+    if (i === deckIdx) b.className = 'on';
+    b.onclick = () => { deckIdx = i; drawDecks(); startDeck(); };
+    bar.appendChild(b);
+  });
+  if (decks.length) startDeck();
+}
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function startDeck(){
+  const d = decks[deckIdx];
+  queue = shuffle(d.cards.filter(c => !known[c.word]));
+  next();
+}
+function next(){
+  const d = decks[deckIdx];
+  const done = d.cards.filter(c => known[c.word]).length;
+  $('cStat').textContent = '已記住 ' + done + ' / ' + d.cards.length;
+  $('card').classList.remove('flipped');
+  current = queue.shift() || null;
+  if (!current){
+    $('cFront').textContent = '這組全部記住了 🎉';
+    $('cMeaning').textContent = ''; $('cExtra').textContent = '';
+    return;
+  }
+  $('cFront').textContent = current.word;
+  $('cMeaning').textContent = current.meaning;
+  $('cExtra').innerHTML = current.ex ? '<div class="kx">' + current.ex + '</div><div>' + (HANGUL.test(current.exZh) ? '' : current.exZh) + '</div>' : '';
+}
+$('card').onclick = () => {
+  if (!current) return;
+  const c = $('card');
+  if (!c.classList.contains('flipped')){ c.classList.add('flipped'); speak(current.word); }
+  else speak(current.ex || current.word);
+};
+$('bKnow').onclick = () => { if (!current) return; known[current.word] = 1; store.set('ko-known', known); next(); };
+$('bAgain').onclick = () => { if (!current) return; queue.splice(Math.min(3, queue.length), 0, current); next(); };
+$('bSpeak').onclick = () => { if (current) speak(current.word); };
+$('bReset').onclick = () => { decks[deckIdx].cards.forEach(c => delete known[c.word]); store.set('ko-known', known); startDeck(); };
+
+/* ---------- mode switch ---------- */
+function setMode(cards){
+  $('mNotes').classList.toggle('on', !cards); $('mCards').classList.toggle('on', cards);
+  notes.style.display = cards ? 'none' : ''; $('cards').style.display = cards ? 'block' : 'none';
+  $('searchbar').style.display = cards ? 'none' : ''; toc.style.display = cards ? 'none' : '';
+  window.scrollTo(0, 0);
+}
+$('mNotes').onclick = () => setMode(false);
+$('mCards').onclick = () => setMode(true);
+
+fetch('content.md', { cache: 'no-cache' })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+  .then(render)
+  .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
+</script>
+</body>
+</html>
