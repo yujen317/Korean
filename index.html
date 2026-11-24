@@ -299,8 +299,8 @@
       <button id="mCards">單字卡</button>
       <button id="mDaily">每日</button>
       <button id="mWeek">每週</button>
-      <button id="mNotes">文法筆記</button>
       <button id="mVerbs">動詞</button>
+      <button id="mNotes">文法筆記</button>
       <button id="mBook">課本</button>
   </div>
   <div class="tools" id="searchbar"><input id="q" type="search" placeholder="搜尋韓文或中文，例如：먹다、喝、까지"></div>
@@ -862,6 +862,11 @@ function labelCells(root){
 
 /* 文法筆記的文法段落：只在「例句」放發音鍵和拼音 */
 function grammarSkip(el){
+  if (el.closest('#verbs')){
+    if (el.matches('.vhead .vw')) return true;                 // 動詞標題不放
+    if (!el.closest('.vcard')) return !(/例句/.test(el.dataset.label || '') || /[.?!]\s*$/.test(el.textContent.trim()));  // 上方說明表
+    return el.classList.contains('f');                          // 卡片裡只留例句
+  }
   if (!el.matches || !el.matches('td')) return false;
   if (el.closest('#textbook')){ const w = el.closest('.tablewrap'); let h = w && w.previousElementSibling; while (h && h.tagName !== 'H2') h = h.previousElementSibling; return !!(h && /句型/.test(h.textContent)); }
   const sec = el.closest('#notes section'); if (!sec) return false;
