@@ -159,19 +159,59 @@
 
   blockquote{margin:10px 0 12px;padding:10px 14px;background:#fff8e1;border-left:4px solid #ffd36e;border-radius:12px;color:#5a4a3a}
   blockquote p{margin:4px 0}
+
+  /* mode bar on its own row */
+  .mode{display:flex;max-width:960px;margin:8px auto 0;overflow-x:auto;scrollbar-width:none;gap:2px}
+  .mode::-webkit-scrollbar{display:none}
+  .mode button{flex:1 0 auto;padding:7px 12px;font-size:14px}
+  /* weekly page */
+  .wcard{background:var(--paper);border:1px solid var(--line);border-radius:18px;margin:16px 0;overflow:hidden;box-shadow:0 3px 12px rgba(232,112,138,.08);scroll-margin-top:150px}
+  .wcard.now{border:2px solid var(--accent)}
+  .whead{padding:12px 16px;background:#fde7ee;cursor:pointer}
+  .whead .wn{font-family:"Jua","Noto Sans TC";font-size:21px;color:#4a3a44}
+  .whead .wd{font-size:12px;color:var(--muted);margin-left:6px}
+  .whead .now-tag{font-size:12px;background:var(--accent);color:#fff;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+  .whead .wgoal{font-size:14px;margin-top:4px}
+  .wbar{height:8px;background:#fff;border-radius:99px;margin-top:8px;overflow:hidden}
+  .wbar i{display:block;height:100%;background:linear-gradient(90deg,#f28da3,#ffd36e);border-radius:99px;transition:width .3s}
+  .wbody{padding:6px 16px 14px;display:none}
+  .wcard.open .wbody{display:block}
+  .wbody h4{margin:12px 0 6px;font-size:15px;color:#d0607b}
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .chk:last-child{border-bottom:0}
+  .chk input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;border:2px solid #f3b4c4;border-radius:7px;margin-top:2px;background:#fff;cursor:pointer;display:grid;place-content:center}
+  .chk input:checked{background:#6cc3a8;border-color:#6cc3a8}
+  .chk input:checked::after{content:"✓";color:#fff;font-size:14px;font-weight:700}
+  .chk.done .ktext{opacity:.55}
+  .chk .ktext{flex:1;min-width:0}
+  .chk .kw{font-family:"Noto Sans KR";color:var(--ko);font-weight:600;cursor:pointer}
+  .chk .kz{color:var(--muted);font-size:14px}
+  .chk .kex{display:block;font-size:14px}
+  .wgrid{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
+  .wsum{margin:10px 0 4px;font-size:14px;color:var(--muted)}
+
+  /* review fixes */
+  td,.vforms,.chk .kw{word-break:keep-all;overflow-wrap:anywhere}
+  header .top{transition:max-height .25s,opacity .2s;max-height:60px;overflow:hidden}
+  header.compact .top{max-height:0;opacity:0}
+  header.compact .tools{display:none}
+  #mascot{width:84px;height:96px;transition:transform .25s,opacity .25s}
+  #mascot.tuck{transform:translateX(46px);opacity:.75}
+  #bubble{right:92px;bottom:calc(70px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
 <header>
   <div class="top">
     <div class="brand"><span class="kbrand">한국어 노트</span><small>韓文學習筆記</small></div>
-    <div class="mode">
+  </div>
+  <div class="mode" id="modebar">
+      <button id="mWeek">每週</button>
       <button id="mNotes" class="on">筆記</button>
       <button id="mVerbs">動詞</button>
       <button id="mBook">課本</button>
       <button id="mDaily">每日</button>
       <button id="mCards">單字卡</button>
-    </div>
   </div>
   <div class="tools" id="searchbar"><input id="q" type="search" placeholder="搜尋韓文或中文，例如：먹다、喝、까지"></div>
   <nav id="toc"></nav>
@@ -179,6 +219,7 @@
 
 <main>
   <div id="notes"><p class="hint">載入中…</p></div>
+  <div id="week" style="display:none"></div>
   <div id="verbs" style="display:none"></div>
   <div id="textbook" style="display:none"></div>
   <div id="daily" style="display:none"><p class="hint">載入中…</p></div>
@@ -251,6 +292,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script src="verbs.js"></script>
+<script src="weekly.js"></script>
 <script>
 const HANGUL = /[가-힣]/;
 const store = {
@@ -476,6 +518,61 @@ setTimeout(() => say(GREETING, true), 700);
 
 
 
+
+/* ---------- weekly goals page ---------- */
+const weekEl = document.getElementById('week');
+const wdone = store.get('ko-week', {});
+function curWeek(){
+  if (typeof WEEK_START === 'undefined') return 1;
+  const d = Math.floor((Date.now() - new Date(WEEK_START + 'T00:00:00+08:00')) / 864e5);
+  return Math.min(12, Math.max(1, Math.floor(d / 7) + 1));
+}
+function wdate(i){
+  const a = new Date(new Date(WEEK_START + 'T00:00:00+08:00').getTime() + i * 7 * 864e5), b = new Date(a.getTime() + 6 * 864e5);
+  const f = x => (x.getMonth() + 1) + '/' + x.getDate();
+  return f(a) + '–' + f(b);
+}
+function renderWeek(){
+  if (typeof WEEKS === 'undefined') return;
+  const now = curWeek();
+  let h = '<p class="wsum">每週學會這些單字和句型就打勾，進度會存在這支手機裡。點週次可以展開或收起，點韓文聽發音。</p>';
+  WEEKS.forEach((w, i) => {
+    const n = i + 1;
+    h += '<div class="wcard' + (n === now ? ' now open' : '') + '" id="w' + n + '"><div class="whead" data-w="' + n + '">'
+      + '<span class="wn">第 ' + n + ' 週｜' + esc(w.t) + '</span><span class="wd">' + wdate(i) + '</span>' + (n === now ? '<span class="now-tag">本週</span>' : '')
+      + '<div class="wgoal">🎯 ' + esc(w.goal) + '</div><div class="wbar"><i id="wb' + n + '"></i></div></div><div class="wbody">';
+    h += '<h4>必備句型</h4>';
+    w.p.forEach((p, j) => {
+      const k = n + 'p' + j;
+      h += '<label class="chk' + (wdone[k] ? ' done' : '') + '"><input type="checkbox" data-k="' + k + '"' + (wdone[k] ? ' checked' : '') + '><span class="ktext"><span class="kw" data-say="' + esc(p[2]) + '">' + esc(p[0]) + '</span> <span class="kz">' + esc(p[1]) + '</span><span class="kex"><span class="kw" data-say="' + esc(p[2]) + '">' + esc(p[2]) + '</span> <span class="kz">' + esc(p[3]) + '</span></span></span></label>';
+    });
+    h += '<h4>必背單字</h4><div class="wgrid">';
+    w.w.forEach((x, j) => {
+      const [ko, zh] = x.split(':'); const k = n + 'w' + j;
+      h += '<label class="chk' + (wdone[k] ? ' done' : '') + '"><input type="checkbox" data-k="' + k + '"' + (wdone[k] ? ' checked' : '') + '><span class="ktext"><span class="kw" data-say="' + esc(ko) + '">' + esc(ko) + '</span><br><span class="kz">' + esc(zh) + '</span></span></label>';
+    });
+    h += '</div></div></div>';
+  });
+  weekEl.innerHTML = h;
+  WEEKS.forEach((w, i) => updBar(i + 1));
+}
+function updBar(n){
+  const w = WEEKS[n - 1], total = w.p.length + w.w.length;
+  let d = 0; w.p.forEach((_, j) => { if (wdone[n + 'p' + j]) d++; }); w.w.forEach((_, j) => { if (wdone[n + 'w' + j]) d++; });
+  const el = document.getElementById('wb' + n); if (el) el.style.width = Math.round(d / total * 100) + '%';
+}
+weekEl.addEventListener('click', e => {
+  const say = e.target.closest('.kw'); if (say){ e.preventDefault(); speak(say.dataset.say || say.textContent, say); return; }
+  const hd = e.target.closest('.whead'); if (hd) hd.parentNode.classList.toggle('open');
+});
+weekEl.addEventListener('change', e => {
+  const c = e.target; if (!c.dataset.k) return;
+  if (c.checked) wdone[c.dataset.k] = 1; else delete wdone[c.dataset.k];
+  store.set('ko-week', wdone);
+  c.closest('.chk').classList.toggle('done', c.checked);
+  updBar(parseInt(c.dataset.k));
+});
+
 /* ---------- textbook page ---------- */
 const bookEl = document.getElementById('textbook');
 function renderBook(md){
@@ -534,9 +631,21 @@ verbsEl.addEventListener('click', e => {
   speak(t.textContent, el);
 });
 
+
+/* ---------- review fixes: compact header & tuck mascot while scrolling ---------- */
+let lastY = 0, tuckT = null;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  document.querySelector('header').classList.toggle('compact', y > 60);
+  const m = document.getElementById('mascot');
+  if (Math.abs(y - lastY) > 4){ m.classList.add('tuck'); clearTimeout(tuckT); tuckT = setTimeout(() => m.classList.remove('tuck'), 900); }
+  lastY = y;
+}, { passive: true });
+
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
+  $('mWeek').classList.toggle('on', m === 'week'); weekEl.style.display = m === 'week' ? '' : 'none';
   $('mBook').classList.toggle('on', m === 'book'); bookEl.style.display = m === 'book' ? '' : 'none';
   $('mVerbs').classList.toggle('on', m === 'verbs'); verbsEl.style.display = m === 'verbs' ? '' : 'none';
   $('mNotes').classList.toggle('on', m === 'notes'); $('mDaily').classList.toggle('on', m === 'daily'); $('mCards').classList.toggle('on', m === 'cards');
@@ -549,16 +658,20 @@ $('mNotes').onclick = () => setMode('notes');
 $('mDaily').onclick = () => setMode('daily');
 $('mVerbs').onclick = () => setMode('verbs');
 $('mBook').onclick = () => setMode('book');
+$('mWeek').onclick = () => { setMode('week'); const c = document.querySelector('.wcard.now'); if (c) c.scrollIntoView(); };
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
   .then(([md, dmd, bmd]) => {
-    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs();
+    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek();
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
     else if (/book/.test(location.hash)) setMode('book');
+    else if (/week/.test(location.hash)) setMode('week');
+    else if (/notes/.test(location.hash)) setMode('notes');
+    else { setMode('week'); }
   })
   .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
 </script>
