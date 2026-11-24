@@ -77,14 +77,14 @@
   #mascot{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;width:108px;height:122px;cursor:pointer;filter:drop-shadow(0 4px 10px rgba(60,40,20,.18));
     -webkit-tap-highlight-color:transparent}
   #mascot svg{width:100%;height:100%;overflow:visible;animation:bob 2.6s ease-in-out infinite}
-  #mascot .earL{transform-origin:50px 14px;animation:earL 3.2s ease-in-out infinite}
+  #mascot .earL{transform-origin:56px 22px;animation:earL 3.2s ease-in-out infinite}
   #mascot .earR{transform-origin:62px 34px;animation:earR 3.2s ease-in-out infinite}
   #mascot .paw{transform-origin:76px 84px;animation:wave 1.2s ease-in-out 3}
   #mascot.hello .paw{animation:wave 1.2s ease-in-out 2}
   #mascot .eye{transform-origin:center;transform-box:fill-box;animation:blink 4s infinite}
   #mascot.hop svg{animation:hop .5s ease}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-  @keyframes earL{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
+  @keyframes earL{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg) translateY(-.6px)}}
   @keyframes earR{0%,100%{transform:rotate(0)}50%{transform:rotate(8deg)}}
   @keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-25deg)}75%{transform:rotate(15deg)}}
   @keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
@@ -142,9 +142,11 @@
   <ellipse cx="21" cy="46" rx="5" ry="6.5" fill="#f0c7a8"/><ellipse cx="79" cy="46" rx="5" ry="6.5" fill="#f0c7a8"/>
   <!-- head -->
   <ellipse cx="50" cy="44" rx="29" ry="28" fill="#f6d3b7"/>
-  <!-- hair -->
-  <path d="M21 42 Q19 16 42 13 Q50 10 60 13 Q81 17 79 42 Q76 30 70 27 Q62 22 52 24 Q40 22 32 27 Q24 31 21 42 Z" fill="#2a2627"/>
-  <g class="earL"><path d="M47 14 q3 -7 9 -6 q-3 3 -2 7 Z" fill="#2a2627"/></g>
+  <!-- hair: side-swept with volume -->
+  <path d="M21 44 Q17 20 36 11 Q50 4 66 9 Q83 16 80 40 Q79 33 76 30 L76 38 Q74 28 66 25 Q56 30 44 28 Q33 27 27 34 Q23 38 21 44 Z" fill="#232021"/>
+  <g class="earL"><path d="M30 26 Q38 6 62 8 Q78 11 80 26 Q70 14 56 17 Q44 19 38 30 Q35 22 30 26 Z" fill="#2e2a2b"/></g>
+  <path d="M40 17 Q52 10 66 13" stroke="#5a5455" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".7"/>
+  <path d="M22 44 L22 50 M78 44 L78 50" stroke="#232021" stroke-width="2.5" stroke-linecap="round"/>
   <!-- glasses -->
   <rect class="glass" x="27" y="40" width="19" height="13" rx="5" fill="#fff" fill-opacity=".25" stroke="#2b2f3a" stroke-width="2"/>
   <rect class="glass" x="54" y="40" width="19" height="13" rx="5" fill="#fff" fill-opacity=".25" stroke="#2b2f3a" stroke-width="2"/>
