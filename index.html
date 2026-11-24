@@ -301,22 +301,29 @@ const store = {
 };
 
 /* ---------- speech ---------- */
-let koVoice = null;
+let koVoice = null, koMale = null;
 function pickVoice(){
-  try{ const vs = speechSynthesis.getVoices(); koVoice = vs.find(v => /ko(-|_)KR/i.test(v.lang)) || vs.find(v => /^ko/i.test(v.lang)) || null; }catch(e){}
+  try{
+    const vs = speechSynthesis.getVoices().filter(v => /^ko/i.test(v.lang));
+    koVoice = vs.find(v => /ko(-|_)KR/i.test(v.lang)) || vs[0] || null;
+    // 公仔用的男聲：找名字看起來是男聲的韓文語音（各系統名稱不同）
+    koMale = vs.find(v => /male|남성|minsu|injoon|hyunsu|jinho|seojun|bongjin|gookmin|jihun/i.test(v.name) && !/female|여성/i.test(v.name)) || null;
+  }catch(e){}
 }
 if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 function koOnly(t){
   // keep Hangul, digits, spaces and basic punctuation; drop Chinese notes
   return t.replace(/[（(][^）)]*[）)]/g,' ').replace(/[^가-힣ㄱ-ㆎ0-9 ,.?!~\-\/]/g,' ').replace(/\s+/g,' ').trim();
 }
-function speak(text, el){
+function speak(text, el, male){
   if (!('speechSynthesis' in window)) return;
   const t = koOnly(text); if (!t) return;
   try{
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(t);
-    u.lang = 'ko-KR'; u.rate = 0.85; if (koVoice) u.voice = koVoice;
+    u.lang = 'ko-KR'; u.rate = 0.85;
+    if (male && koMale){ u.voice = koMale; }
+    else { if (koVoice) u.voice = koVoice; if (male){ u.pitch = 0.55; u.rate = 0.9; } } // 沒有男聲時把音調壓低
     if (el){ el.classList.add('speaking'); u.onend = u.onerror = () => el.classList.remove('speaking'); }
     speechSynthesis.speak(u);
   }catch(e){}
@@ -506,7 +513,7 @@ function say(p, withVoice){
   $('bK').textContent = p.ko; $('bZ').textContent = p.zh;
   $('bubble').classList.add('show');
   clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $('bubble').classList.remove('show'), 4500);
-  if (withVoice) speak(p.ko);
+  if (withVoice) speak(p.ko, null, true);
 }
 $('mascot').onclick = () => {
   const m = $('mascot'); m.classList.remove('hop'); void m.offsetWidth; m.classList.add('hop');
