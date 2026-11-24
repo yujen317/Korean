@@ -490,3 +490,34 @@
 | 친구 | 朋友 | 親舊 | 친구를 만나요. | 和朋友見面。 |
 
 注意：방학 是寒暑假，不是中文的「放學」；「大學畢業」要說 대학교를 졸업해요，用 을/를 不用 에서。
+
+
+## 單字：韓文小紙條
+
+> 白話說明：每天聊天最常冒出來的短句，整句背起來直接用就好，不用拆文法。
+
+| 韓文 | 中文 | 發音 |
+| --- | --- | --- |
+| 그렇군요 | 原來如此；原來是這樣 | geu-reo-ku-nyo |
+| 한국어를 못 하지만 배우고 있어요 | 我不會說韓文，但我正在學 | han-gu-geo-reul mo-ta-ji-man bae-u-go i-sseo-yo |
+| 몇 시에 집에 가요? | 你幾點要回家？ | myeot si-e ji-be ga-yo |
+| 잘 못 들었어요 | 我沒聽清楚 | jal mot tteu-reo-sseo-yo |
+| 무슨 뜻이에요? | 這是什麼意思？ | mu-seun tteu-si-e-yo |
+| 한국어로 어떻게 말해요? | 用韓文怎麼說？ | han-gu-geo-ro eo-tteo-ke ma-rae-yo |
+| 알겠어요 | 我明白了 | al-ge-sseo-yo |
+| 잘 모르겠어요 | 我不太清楚 | jal mo-reu-ge-sseo-yo |
+| 알았어요 | 我知道了 | a-ra-sseo-yo |
+| 그래요? | 是嗎？ | geu-rae-yo |
+| 어쩔 수 없어요 | 沒辦法；沒有辦法（無可奈何） | eo-jjeol su eop-seo-yo |
+| 괜찮은 것 같아요 | 我覺得還不錯 | gwaen-cha-neun geot-kka-ta-yo |
+| 별로예요 | 不怎麼樣、不太好 | byeol-lo-ye-yo |
+| 피곤해요 | 我很累 | pi-go-nae-yo |
+| 졸려요 | 我睏了 | jol-lyeo-yo |
+| 기분이 좋아요 | 心情很好 | gi-bu-ni jo-a-yo |
+| 기분이 안 좋아요 | 我心情不好 | gi-bu-ni an jo-a-yo |
+| 오늘 뭐 했어요? | 你今天做了什麼？ | o-neul mwo hae-sseo-yo |
+| 같이 먹을래요? | 要一起吃嗎？ | ga-chi meo-geul-lae-yo |
+| 잘 먹었어요 | 我吃飽了／謝謝招待（飯後跟請客或煮飯的人說） | jal meo-geo-sseo-yo |
+| 금방 갈게요 | 我馬上過去 | geum-bang gal-ge-yo |
+| 오늘 좀 정신없어요 | 今天有點手忙腳亂 | o-neul jom jeong-si-neop-sseo-yo |
+| 오늘 일찍 일어났어요 | 今天起得很早 | o-neul il-jjik i-reo-na-sseo-yo |
