@@ -283,7 +283,6 @@
       <button id="mDaily">每日</button>
       <button id="mWeek">每週</button>
       <button id="mNotes">筆記</button>
-      <button id="mGram">文法</button>
       <button id="mVerbs">動詞</button>
       <button id="mBook">課本</button>
   </div>
@@ -434,7 +433,7 @@ function buildToc(){
     h.id = 's' + i;
     const a = document.createElement('a');
     a.href = '#s' + i;
-    a.textContent = h.textContent.replace(/^(句法.)[：:]/, '$1·').replace(/^單字[：:]/, '').replace(/（[^）]*個）/, '').trim();
+    a.textContent = h.textContent.replace(/^單字[：:]/, '單字·').replace(/（(第[^）]*|\d+ 個|由淺入深|規則|課堂筆記)）/g, '').replace(/名詞（(.+?)）/, '$1').trim();
     toc.appendChild(a);
   });
 }
@@ -861,7 +860,6 @@ function addRom(root){
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
-  $('mGram').classList.toggle('on', m === 'gram'); gramEl.style.display = m === 'gram' ? '' : 'none';
   $('mWeek').classList.toggle('on', m === 'week'); weekEl.style.display = m === 'week' ? '' : 'none';
   $('mBook').classList.toggle('on', m === 'book'); bookEl.style.display = m === 'book' ? '' : 'none';
   $('mVerbs').classList.toggle('on', m === 'verbs'); verbsEl.style.display = m === 'verbs' ? '' : 'none';
@@ -875,19 +873,18 @@ $('mNotes').onclick = () => setMode('notes');
 $('mDaily').onclick = () => setMode('daily');
 $('mVerbs').onclick = () => setMode('verbs');
 $('mBook').onclick = () => setMode('book');
-$('mGram').onclick = () => setMode('gram');
 $('mWeek').onclick = () => { setMode('week'); const c = document.querySelector('.wcard.now'); if (c) c.scrollIntoView(); };
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
-Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => ''), get('grammar.md').catch(() => '')])
-  .then(([md, dmd, bmd, gmd]) => {
-    renderDaily(dmd); renderBook(bmd); renderGram(gmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document); addRom(document);
+Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
+  .then(([md, dmd, bmd]) => {
+    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document); addRom(document);
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
     else if (/book/.test(location.hash)) setMode('book');
-    else if (/gram/.test(location.hash)) setMode('gram');
+    else if (/gram/.test(location.hash)) setMode('notes');
     else if (/week/.test(location.hash)) setMode('week');
     else if (/notes/.test(location.hash)) setMode('notes');
     else { setMode('cards'); }
