@@ -228,6 +228,9 @@
   .clist{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:6px 16px 12px;margin:14px 0 20px}
   .clist h4{margin:10px 0 6px;font-size:15px;color:#d0607b}
   @media (min-width: 700px){ #clist{grid-template-columns:repeat(3,1fr)} }
+
+  .row.nav{margin-top:12px}
+  .row.nav button{padding:10px;font-size:15px;color:var(--ko);background:#eef3fb;border-color:#dbe5f5}
 </style>
 </head>
 <body>
@@ -258,9 +261,10 @@
     <div class="deckbar" id="decks"></div>
     <div class="dirbar" id="dirs" style="display:none"><button data-d="ko">韓 → 中</button><button data-d="zh">中 → 韓</button><button data-d="both">中韓對照</button></div>
     <div class="card" id="card"><div class="front" id="cFront"></div><div class="back"><div class="meaning" id="cMeaning"></div><div class="extra" id="cExtra"></div></div></div>
+    <div class="row nav"><button id="bPrev">‹ 上一張</button><button id="bNext">下一張 ›</button></div>
     <div class="row"><button class="again" id="bAgain">再看一次</button><button class="know" id="bKnow">記住了 ✓</button></div>
     <div class="stat"><span id="cStat"></span><span><button id="bSpeak">🔊 發音</button> · <button id="bReset">重設進度</button></span></div>
-    <p class="hint">點卡片聽發音；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
+    <p class="hint">點卡片聽發音，左右滑動或按上一張／下一張翻頁；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
     <div class="clist"><h4>這組單字清單 <span id="clistStat" class="kz"></span></h4><div class="wgrid" id="clist"></div></div>
   </div>
 </main>
@@ -484,6 +488,7 @@ function drawDecks(){
 }
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function startDeck(){
+  hist = []; current = null;
   const d = decks[deckIdx];
   queue = shuffle(d.cards.filter(c => !known[c.word]));
   next();
@@ -493,6 +498,7 @@ function next(){
   const done = d.cards.filter(c => known[c.word]).length;
   $('cStat').textContent = '已記住 ' + done + ' / ' + d.cards.length;
   $('card').classList.remove('flipped');
+  if (current && !noHist) hist.push(current); noHist = false;
   current = queue.shift() || null;
   if (!current){
     $('cFront').textContent = '這組全部記住了 🎉';
@@ -516,6 +522,16 @@ function next(){
   drawList();
 }
 let dir = 'both'; // 單字卡固定中韓對照
+let hist = [], noHist = false;
+function prevCard(){
+  // 回到上一張（跳過已記住的）
+  while (hist.length && known[hist[hist.length - 1].word]) hist.pop();
+  if (!hist.length) return;
+  const p = hist.pop();
+  if (current) queue.unshift(current);
+  queue.unshift(p); noHist = true; next();
+}
+function skipCard(){ if (!current) return; queue.push(current); next(); }
 function drawDirs(){ document.querySelectorAll('#dirs button').forEach(b => b.classList.toggle('on', b.dataset.d === dir)); }
 document.querySelectorAll('#dirs button').forEach(b => b.onclick = () => { dir = b.dataset.d; store.set('ko-dir', dir); drawDirs(); if (current) queue.unshift(current); next(); });
 drawDirs();
@@ -526,6 +542,14 @@ $('card').onclick = () => {
   if (!c.classList.contains('flipped')){ c.classList.add('flipped'); speak(current.word); }
   else speak(current.ex || current.word);
 };
+$('bPrev').onclick = prevCard;
+$('bNext').onclick = skipCard;
+// 左右滑動翻頁
+(() => { let x0 = null, y0 = null; const c = $('card');
+  c.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  c.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { e.preventDefault(); dx < 0 ? skipCard() : prevCard(); } });
+})();
 $('bKnow').onclick = () => { if (!current) return; known[current.word] = 1; store.set('ko-known', known); next(); };
 $('bAgain').onclick = () => { if (!current) return; queue.splice(Math.min(3, queue.length), 0, current); next(); };
 $('bSpeak').onclick = () => { if (current) speak(current.word); };
