@@ -232,11 +232,11 @@
     <div class="brand"><span class="kbrand">한국어 노트</span><small>韓文學習筆記</small></div>
   </div>
   <div class="mode" id="modebar">
+      <button id="mCards">單字卡</button>
       <button id="mDaily">每日</button>
       <button id="mNotes">筆記</button>
       <button id="mVerbs">動詞</button>
       <button id="mBook">課本</button>
-      <button id="mCards">單字卡</button>
       <button id="mWeek">每週</button>
   </div>
   <div class="tools" id="searchbar"><input id="q" type="search" placeholder="搜尋韓文或中文，例如：먹다、喝、까지"></div>
@@ -743,7 +743,7 @@ Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n�
     else if (/book/.test(location.hash)) setMode('book');
     else if (/week/.test(location.hash)) setMode('week');
     else if (/notes/.test(location.hash)) setMode('notes');
-    else { setMode('daily'); }
+    else { setMode('cards'); }
   })
   .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
 </script>
