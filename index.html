@@ -714,31 +714,28 @@ weekEl.addEventListener('change', e => {
 const bookEl = document.getElementById('textbook');
 function renderBook(md){
   bookEl.innerHTML = marked.parse(md);
-  const lessons = {};
-  bookEl.querySelectorAll('h2').forEach((h, i) => {
-    h.id = 'd' + (i + 1);
-    const m = h.textContent.match(/｜(1[AB] 第\d+課)｜/);
-    if (m && !lessons[m[1]]) lessons[m[1]] = h.id;
-  });
   const nav = document.createElement('div'); nav.className = 'bchips';
-  nav.innerHTML = Object.entries(lessons).map(([k, id]) => '<a href="#' + id + '">' + k + '</a>').join('');
-  const h1 = bookEl.querySelector('h1'); (h1 ? h1.after(nav) : bookEl.prepend(nav));
+  bookEl.querySelectorAll('h2').forEach((h, i) => { h.id = 'b' + i; });
+  nav.innerHTML = [...bookEl.querySelectorAll('h2')].map(h => '<a href="#' + h.id + '">' + h.textContent + '</a>').join('');
+  bookEl.prepend(nav);
   bookEl.querySelectorAll('table').forEach(t => { const w = document.createElement('div'); w.className = 'tablewrap'; t.parentNode.insertBefore(w, t); w.appendChild(t); });
-  bookEl.querySelectorAll('td').forEach(td => { if (HANGUL.test(td.textContent)) td.classList.add('ko'); });
+  bookEl.querySelectorAll('table').forEach(t => {
+    const heads = [...t.querySelectorAll('th')].map(th => th.textContent.trim());
+    t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => {
+      if (HANGUL.test(td.textContent) && !/白話|中文/.test(heads[i] || '')) td.classList.add('ko');
+    }));
+  });
 }
 bookEl.addEventListener('click', e => { const td = e.target.closest('td.ko'); if (td) speak(td.textContent, td); });
 function bookDecks(){
-  const out = {}; let cur = null;
-  bookEl.querySelectorAll('h2, table').forEach(el => {
-    if (el.tagName === 'H2'){ const m = el.textContent.match(/｜(1[AB] 第\d+課)｜/); cur = m ? m[1] : null; return; }
-    if (!cur) return;
-    el.querySelectorAll('tbody tr').forEach(tr => {
-      const t = [...tr.children].map(td => td.textContent.trim());
-      (out[cur] = out[cur] || []);
-      if (t[0] && !out[cur].some(c => c.word === t[0])) out[cur].push({ word: t[0], meaning: t[1], ex: t[2] || '', exZh: '' });
-    });
+  const out = [];
+  bookEl.querySelectorAll('h2').forEach(h => {
+    if (!/^單字/.test(h.textContent)) return;
+    const wrap = h.nextElementSibling; const t = wrap && wrap.querySelector('table'); if (!t) return;
+    const cards = [...t.querySelectorAll('tbody tr')].map(tr => { const x = [...tr.children].map(td => td.textContent.trim()); return { word: x[0], meaning: x[1], ex: x[2] || '', exZh: '' }; });
+    out.push({ title: '課本' + h.textContent.replace(/^單字/, ''), cards });
   });
-  return Object.entries(out).map(([k, cards]) => ({ title: '課本 ' + k, cards }));
+  return out;
 }
 
 /* ---------- verbs page ---------- */
