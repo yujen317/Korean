@@ -615,7 +615,7 @@ function buildDecks(){
     });
   });
   if (dcards.length) decks.unshift({ title: '每日單字', cards: dcards });
-  decks.push(...decksFromMd(BOOK_MD).filter(d => /^單字/.test(d.title)).map(d => ({ title: '課本單字', cards: d.cards })));
+  decks.push(...decksFromMd(BOOK_MD).filter(d => /^單字/.test(d.title)).map(d => ({ title: '補充單字句型', cards: d.cards })));
   // 同一個單字只出現一次：保留第一次出現的那一組
   const seen = new Set();
   decks.forEach(d => { d.cards = d.cards.filter(c => { const k = c.word.replace(/\s+/g, ''); if (seen.has(k)) return false; seen.add(k); return true; }); });
@@ -913,7 +913,7 @@ function bookDecks(){
     if (!/^單字/.test(h.textContent)) return;
     const wrap = h.nextElementSibling; const t = wrap && wrap.querySelector('table'); if (!t) return;
     const cards = [...t.querySelectorAll('tbody tr')].map(tr => { const x = [...tr.children].map(td => td.textContent.trim()); return { word: x[0], meaning: x[1], ex: x[2] || '', exZh: '' }; });
-    out.push({ title: '課本單字', cards });
+    out.push({ title: '補充單字句型', cards });
   });
   return out;
 }
