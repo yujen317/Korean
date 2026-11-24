@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>韓文學習筆記｜韓檢初級單字與句型</title>
-<meta name="theme-color" content="#fff5f7">
+<meta name="theme-color" content="#12151f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Serif+KR:wght@500;700&family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+KR:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#fff5f7; --paper:#fffefe; --ink:#3a2f35; --muted:#8a7a84; --line:#f3dbe2;
@@ -287,12 +287,95 @@
   #notes > section.fold .tablewrap{box-shadow:none}
   #toTop{position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--accent);font-size:20px;box-shadow:0 4px 12px rgba(60,40,20,.12);display:none;cursor:pointer}
   #toTop.show{display:block}
+
+  /* =====================================================================
+     DARK · ELEGANT THEME — 쪽빛（靛藍）底、金線、단청（丹青）彩帶、창살（窗櫺）紋
+     ===================================================================== */
+  :root{
+    --bg:#11141d; --paper:#1a1f2d; --paper2:#212738; --ink:#ebe4d6; --muted:#9c9484; --line:#323a50;
+    --accent:#c9a45c; --gold:#c9a45c; --gold2:#e6c886; --ko:#e8cf96; --red:#a8412f; --jade:#3f7f6e; --navy:#2c4a78;
+  }
+  html{background:var(--bg)}
+  body{color:var(--ink);background-color:var(--bg);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23c9a45c' stroke-opacity='.07' stroke-width='1'%3E%3Crect x='.5' y='.5' width='71' height='71'/%3E%3Cpath d='M36 0v72M0 36h72M18 18h36v36H18z'/%3E%3Cpath d='M18 18L0 0M54 18L72 0M18 54L0 72M54 54l18 18'/%3E%3C/g%3E%3C/svg%3E"),
+      radial-gradient(1200px 600px at 50% -200px, rgba(201,164,92,.10), transparent 70%);
+    background-size:72px 72px, 100% 100%}
+  header{background:rgba(17,20,29,.92)}
+  header::before{height:8px;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='8'%3E%3Crect width='12' height='8' fill='%233f7f6e'/%3E%3Crect x='12' width='12' height='8' fill='%23a8412f'/%3E%3Crect x='24' width='12' height='8' fill='%232c4a78'/%3E%3Crect x='36' width='12' height='8' fill='%23c9a45c'/%3E%3Cpath d='M6 1l3 3-3 3-3-3zM18 1l3 3-3 3-3-3zM30 1l3 3-3 3-3-3zM42 1l3 3-3 3-3-3z' fill='%23ebe4d6' fill-opacity='.55'/%3E%3C/svg%3E") repeat-x}
+  header::after{background:linear-gradient(90deg,transparent,rgba(201,164,92,.5),transparent)}
+  .brand .kbrand{font-family:"Noto Serif KR",serif;font-weight:700;color:var(--gold2);letter-spacing:2px;font-size:23px}
+  .brand small{color:var(--muted);letter-spacing:3px;font-family:"Noto Serif TC",serif}
+  .mode{background:var(--paper);border-color:var(--line)}
+  .mode button{color:var(--muted)}
+  .mode button.on,.dirbar button.on{background:linear-gradient(180deg,#d8b874,#b38f47);color:#1a1510;font-weight:700}
+  .fsz button{background:var(--paper);border-color:var(--line);color:var(--ink)}
+  .fsz button.on{background:var(--gold);border-color:var(--gold);color:#1a1510}
+  #q{background:var(--paper);border-color:var(--line);color:var(--ink)}
+  #q::placeholder{color:#6f6a60}
+  nav#toc a, .bchips a, .vchips a, .deckbar button{background:var(--paper) !important;border-color:var(--line) !important;color:var(--ink) !important}
+  nav#toc a:hover, .bchips a:hover{border-color:var(--gold) !important}
+  .vchips a{color:var(--ko) !important;font-family:"Noto Serif KR",serif}
+  .deckbar button.on{background:var(--red) !important;border-color:var(--red) !important;color:#f5ecd9 !important}
+  /* headings — serif, gold ornament */
+  #notes h2,#daily h2,#verbs h2,#textbook h2,#gram h2{font-family:"Noto Serif TC","Noto Serif KR",serif !important;font-weight:700 !important;color:var(--gold2) !important}
+  #notes h2::before,#daily h2::before{width:22px;height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23c9a45c' stroke-width='1.6'%3E%3Cpath d='M12 2l10 10-10 10L2 12z'/%3E%3Cpath d='M12 7l5 5-5 5-5-5z'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23a8412f'/%3E%3C/svg%3E") center/contain no-repeat}
+  #notes h3,#daily h3,#textbook h3,.wbody h4,.clist h4,.sfold > h3{color:#d9a679 !important;font-family:"Noto Serif TC",serif}
+  #textbook h2 + p{color:#d9a679}
+  /* surfaces */
+  .tablewrap,section.fold,.vcard,.wcard,.clist,.card{background:var(--paper) !important;border-color:var(--line) !important;box-shadow:0 10px 30px rgba(0,0,0,.35) !important}
+  section.fold{border-top:2px solid rgba(201,164,92,.35) !important}
+  th{background:var(--paper2) !important;color:var(--gold) !important;letter-spacing:.5px}
+  td{border-color:var(--line) !important}
+  .tablewrap tr{border-color:var(--line) !important}
+  .sfold{border-color:var(--line) !important}
+  .ko,.chk .kw,.vhead .vw,.card .front,.vforms span{color:var(--ko) !important}
+  .ko:hover{background:rgba(201,164,92,.10)}
+  .ko.speaking{background:rgba(201,164,92,.22)}
+  .card .front.zh{color:var(--ink) !important}
+  .card .sub{color:var(--ink) !important}
+  .card .extra,.card .extra .kx{color:var(--muted)}
+  .card .extra .kx{color:var(--ko) !important}
+  .card{background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30'%3E%3Cpath d='M0 22 q10-12 20 0 t20 0 t20 0 t20 0 t20 0 t20 0' stroke='%23c9a45c' stroke-opacity='.25' stroke-width='1.5' fill='none'/%3E%3Cpath d='M0 26 q10-12 20 0 t20 0 t20 0 t20 0 t20 0 t20 0' stroke='%23c9a45c' stroke-opacity='.12' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") bottom/120px 30px repeat-x !important;border:1px solid rgba(201,164,92,.45) !important}
+  .rom{color:#8d877c}
+  .kz,.chk .kz,.vcard .m,.vcard .zh,.hint,.wsum,.whead .wd{color:var(--muted) !important}
+  blockquote,.intro{background:rgba(201,164,92,.08) !important;border-left-color:var(--gold) !important;color:var(--ink) !important}
+  .vhead,.whead{background:linear-gradient(90deg,rgba(168,65,47,.28),rgba(44,74,120,.22)) !important}
+  .vhead .vz,.whead .wn{color:var(--ink) !important;font-family:"Noto Serif TC",serif}
+  .vhead .vn{color:#e0907d !important}
+  .vforms span{color:#e6a86a !important}
+  .wcard.now{border:1px solid var(--gold) !important}
+  .whead .now-tag{background:var(--red)}
+  .wbar{background:#2a3044}
+  .wbar i{background:linear-gradient(90deg,var(--red),var(--gold))}
+  .chk{border-color:var(--line) !important}
+  .chk input{background:transparent;border-color:#6c6450}
+  .chk input:checked{background:var(--jade);border-color:var(--jade)}
+  .row button{background:var(--paper2);border-color:var(--line);color:var(--ink)}
+  .row .again{color:#e0907d}
+  .row .know{background:var(--jade) !important;border-color:var(--jade) !important;color:#f2efe6 !important}
+  .row.nav button{background:var(--paper2) !important;border-color:var(--line) !important;color:var(--gold2) !important}
+  .stat,.stat button{color:var(--muted)}
+  .spk{background:rgba(201,164,92,.16);color:var(--gold2)}
+  .spk:active{background:rgba(201,164,92,.35)}
+  .playall{background:var(--red)}
+  #toTop{background:var(--paper);border-color:var(--gold);color:var(--gold)}
+  #bubble{background:var(--paper2);border-color:rgba(201,164,92,.5)}
+  #bubble .k{color:var(--gold2)}
+  #bubble .z{color:var(--muted)}
+  section.fold > h2::after,.sfold > h3::after{color:var(--gold)}
+  .tablewrap td[data-label]::before{color:#7d776b}
+  footer{color:#6f6a60}
+  a{color:var(--gold2)}
+  .tablewrap{box-shadow:none !important}
+  #mascot{filter:drop-shadow(0 0 10px rgba(201,164,92,.35)) drop-shadow(0 4px 10px rgba(0,0,0,.5)) !important}
 </style>
 </head>
 <body>
 <header>
   <div class="top">
-    <div class="brand"><span class="kbrand">한국어 노트</span><small>韓文學習筆記</small></div>
+    <div class="brand"><span class="kbrand">한국어 노트</span><small>韓 文 學 習 筆 記</small></div>
     <div class="fsz" id="fsz"><button class="rbtn" id="romBtn" type="button">拼音</button><button data-z="1" style="font-size:13px">A</button><button data-z="1.15" style="font-size:16px">A</button><button data-z="1.3" style="font-size:19px">A</button></div>
   </div>
   <div class="mode" id="modebar">
