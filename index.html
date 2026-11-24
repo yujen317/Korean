@@ -769,18 +769,26 @@ function refreshStat(){ const d = decks[deckIdx]; $('cStat').textContent = '已�
 
 /* ---------- mascot ---------- */
 // 打開網頁時的招呼語（想換句子就改這裡）
-const GREETING = { ko: '캐런 씨, 저랑 같이 한국어 공부해요.', zh: 'Karen，來跟我一起學韓文吧。' };
+const GREETING = { ko: '캐런 씨, 저랑 같이 한국어 공부해요.', zh: 'Karen，來跟我一起學韓文吧。', audio: 'audio/01.m4a' };
 const PHRASES = [
-  { ko: '오늘도 화이팅!', zh: '今天也加油！' },
-  { ko: '잘하고 있어요.', zh: '你做得很好。' },
-  { ko: '조금만 더 힘내요.', zh: '再加油一下下。' }
+  { ko: '오늘도 화이팅!', zh: '今天也加油！', audio: 'audio/02.m4a' },
+  { ko: '잘하고 있어요.', zh: '你做得很好。', audio: 'audio/03.m4a' },
+  { ko: '조금만 더 힘내요.', zh: '再加油一下下。', audio: 'audio/04.m4a' }
 ];
-let bubbleTimer = null, greeted = false, pi = 0;
+let bubbleTimer = null, greeted = false, pi = 0, curAudio = null;
+// 公仔用真人錄音說話；錄音放不出來時才改用手機語音
+function voice(p){
+  try { if ('speechSynthesis' in window) speechSynthesis.cancel(); if (curAudio) { curAudio.pause(); curAudio = null; } } catch(e){}
+  if (!p.audio) { speak(p.ko, null, true); return; }
+  const a = new Audio(p.audio); curAudio = a;
+  const pr = a.play();
+  if (pr && pr.catch) pr.catch(() => { if (curAudio === a) speak(p.ko, null, true); });
+}
 function say(p, withVoice){
   $('bK').textContent = p.ko; $('bZ').textContent = p.zh;
   $('bubble').classList.add('show');
   clearTimeout(bubbleTimer); bubbleTimer = setTimeout(() => $('bubble').classList.remove('show'), 4500);
-  if (withVoice) speak(p.ko, null, true);
+  if (withVoice) voice(p);
 }
 $('mascot').onclick = () => {
   const m = $('mascot'); m.classList.remove('hop'); void m.offsetWidth; m.classList.add('hop');
