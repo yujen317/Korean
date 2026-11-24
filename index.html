@@ -492,7 +492,7 @@ const APP_VERSION = '202611242048';
   function check(){
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => {
       v = (v || '').trim();
-      if (v && v !== APP_VERSION) location.replace(location.pathname + '?v=' + v + location.hash);
+      if (v && v !== APP_VERSION && new URLSearchParams(location.search).get('v') !== v) location.replace(location.pathname + '?v=' + v + location.hash);   // 已經試過這個版本就不再重整，避免一直重新載入
     }).catch(() => {});
   }
   check();
