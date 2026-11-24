@@ -859,10 +859,23 @@ function labelCells(root){
   });
 }
 
+
+/* 文法筆記的文法段落：只在「例句」放發音鍵和拼音 */
+function grammarSkip(el){
+  if (!el.matches || !el.matches('td')) return false;
+  if (el.closest('#textbook')){ const w = el.closest('.tablewrap'); let h = w && w.previousElementSibling; while (h && h.tagName !== 'H2') h = h.previousElementSibling; return !!(h && /句型/.test(h.textContent)); }
+  const sec = el.closest('#notes section'); if (!sec) return false;
+  const h2 = sec.querySelector('h2'); if (h2 && /^單字/.test(h2.textContent.trim())) return false;
+  const lab = el.dataset.label || '';
+  if (/例句|韓文/.test(lab)) return false;
+  return !/[.?!]\s*$/.test(el.textContent.replace(/🔊/g, '').trim());
+}
+
 /* ---------- speaker buttons after Korean text ---------- */
 function addSpk(root){
   root.querySelectorAll('td.ko, .chk .kw, .vhead .vw').forEach(el => {
     if (el.querySelector(':scope > .spk')) return;
+    if (grammarSkip(el)) return;
     const b = document.createElement('button'); b.type = 'button'; b.className = 'spk'; b.textContent = '🔊'; b.setAttribute('aria-label', '發音');
     const sub = el.querySelector(':scope > .m, :scope > .zh');
     sub ? el.insertBefore(b, sub) : el.appendChild(b);
@@ -884,6 +897,7 @@ function addRom(root){
   if (typeof romanize !== 'function') return;
   root.querySelectorAll('td.ko, .chk .kw, .vhead .vw').forEach(el => {
     if (el.querySelector(':scope > .rom')) return;
+    if (grammarSkip(el)) return;
     if (el.closest('.kex') && el.classList.contains('kw') && el.parentNode.querySelector(':scope > .rom')) return;
     const c = el.cloneNode(true); c.querySelectorAll('.m,.zh,.spk,.rom').forEach(x => x.remove());
     let t = c.textContent.trim().replace(/[（(][^）)]*[\u4e00-\u9fff][^）)]*[）)]/g, '').trim();
