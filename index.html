@@ -581,29 +581,29 @@ function buildToc(){
   });
 }
 
-function buildDecks(){
-  decks = [];
-  notes.querySelectorAll('section').forEach(sec => {
-    const h = sec.querySelector('h2'); if (!h) return;
-    const title = h.textContent;
-    const cards = [];
-    sec.querySelectorAll('table').forEach(tb => {
-      const heads = [...tb.querySelectorAll('th')].map(th => th.textContent.trim());
-      tb.querySelectorAll('tbody tr').forEach(tr => {
-        const tds = [...tr.children].map(td => td.textContent.trim());
-        const ki = tds.findIndex(t => HANGUL.test(t));
-        if (ki < 0 || ki + 1 >= tds.length) return;
-        const word = tds[ki].replace(/[※]|〔連〕/g,'').trim();
-        const meaning = tds[ki + 1];
-        if (HANGUL.test(meaning)) return; // skip grammar rows where next col is also Korean
-        const exIdx = heads.findIndex(x => x === '例句' || x === '例子');
-        const ex = exIdx > -1 ? tds[exIdx] : '';
-        const exZh = exIdx > -1 && tds[exIdx + 1] ? tds[exIdx + 1] : '';
-        cards.push({ word, meaning, ex, exZh });
-      });
+let VOCAB_MD = '', BOOK_MD = '';
+function decksFromMd(md){
+  const box = document.createElement('div'); box.innerHTML = marked.parse(md || '');
+  const out = []; let cur = null;
+  [...box.children].forEach(el => {
+    if (el.tagName === 'H2'){ cur = { title: el.textContent.trim(), cards: [] }; out.push(cur); return; }
+    if (!cur || el.tagName !== 'TABLE') return;
+    const heads = [...el.querySelectorAll('th')].map(th => th.textContent.trim());
+    el.querySelectorAll('tbody tr').forEach(tr => {
+      const tds = [...tr.children].map(td => td.textContent.trim());
+      const ki = tds.findIndex(t => HANGUL.test(t));
+      if (ki < 0 || ki + 1 >= tds.length) return;
+      const word = tds[ki].replace(/[※]|〔連〕/g,'').trim();
+      const meaning = tds[ki + 1];
+      if (HANGUL.test(meaning)) return;
+      const exIdx = heads.findIndex(x => x === '例句' || x === '例子');
+      cur.cards.push({ word, meaning, ex: exIdx > -1 ? tds[exIdx] : '', exZh: exIdx > -1 && tds[exIdx + 1] ? tds[exIdx + 1] : '' });
     });
-    if (cards.length >= 5 && /^單字/.test(title)) decks.push({ title: title.replace(/^單字[：:]/,'').replace(/（[^）]*個）/,'').trim(), cards });
   });
+  return out;
+}
+function buildDecks(){
+  decks = decksFromMd(VOCAB_MD).filter(d => /^單字/.test(d.title)).map(d => ({ title: d.title.replace(/^單字[：:]/,'').replace(/（[^）]*個）/,'').trim(), cards: d.cards }));
   // 每日推送的單字：daily.md 裡表頭第一欄是「單字」的表格
   const dcards = [];
   document.querySelectorAll('#daily table').forEach(tb => {
@@ -615,7 +615,11 @@ function buildDecks(){
     });
   });
   if (dcards.length) decks.unshift({ title: '每日單字', cards: dcards });
-  if (typeof bookDecks === 'function') decks.push(...bookDecks());
+  decks.push(...decksFromMd(BOOK_MD).filter(d => /^單字/.test(d.title)).map(d => ({ title: '課本單字', cards: d.cards })));
+  // 同一個單字只出現一次：保留第一次出現的那一組
+  const seen = new Set();
+  decks.forEach(d => { d.cards = d.cards.filter(c => { const k = c.word.replace(/\s+/g, ''); if (seen.has(k)) return false; seen.add(k); return true; }); });
+  decks = decks.filter(d => d.cards.length);
 }
 
 function render(md){
@@ -887,7 +891,9 @@ gramEl.addEventListener('click', e => { const td = e.target.closest('td.ko'); if
 /* ---------- textbook page ---------- */
 const bookEl = document.getElementById('textbook');
 function renderBook(md){
-  bookEl.innerHTML = marked.parse(md);
+  BOOK_MD = md || '';
+  const cut = BOOK_MD.indexOf('## 單字');
+  bookEl.innerHTML = marked.parse(cut > -1 ? BOOK_MD.slice(0, cut) : BOOK_MD);
   const nav = document.createElement('div'); nav.className = 'bchips';
   bookEl.querySelectorAll('h2').forEach((h, i) => { h.id = 'b' + i; });
   nav.innerHTML = [...bookEl.querySelectorAll('h2')].map(h => '<a href="#' + h.id + '">' + h.textContent + '</a>').join('');
@@ -1074,8 +1080,9 @@ $('mWeek').onclick = () => { setMode('week'); const c = document.querySelector('
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
-Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
-  .then(([md, dmd, bmd]) => {
+Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => ''), get('vocab.md').catch(() => '')])
+  .then(([md, dmd, bmd, vmd]) => {
+    VOCAB_MD = vmd;
     renderDaily(dmd); renderBook(bmd); render(md); renderVerbs(); renderWeek(); labelCells(document); addSpk(document); addRom(document);
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
