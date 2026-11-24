@@ -769,14 +769,11 @@ function refreshStat(){ const d = decks[deckIdx]; $('cStat').textContent = '已�
 
 /* ---------- mascot ---------- */
 // 打開網頁時的招呼語（想換句子就改這裡）
-const GREETING = { ko: '안녕하세요! 저랑 같이 한국어 공부해요!', zh: '你好！來跟我一起學習韓文吧！' };
+const GREETING = { ko: '안녕하세요. 저랑 같이 한국어 공부해요.', zh: '你好，來跟我一起學韓文吧。' };
 const PHRASES = [
   { ko: '오늘도 화이팅!', zh: '今天也加油！' },
-  { ko: '잘하고 있어요!', zh: '你做得很好！' },
-  { ko: '조금만 더 힘내요!', zh: '再加油一下下！' },
-  { ko: '천천히 해도 괜찮아요.', zh: '慢慢來也沒關係。' },
-  { ko: '오늘 단어 다 외웠어요?', zh: '今天的單字都背了嗎？' },
-  { ko: '최고예요!', zh: '你最棒了！' }
+  { ko: '잘하고 있어요.', zh: '你做得很好。' },
+  { ko: '조금만 더 힘내요.', zh: '再加油一下下。' }
 ];
 let bubbleTimer = null, greeted = false, pi = 0;
 function say(p, withVoice){
