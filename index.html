@@ -198,6 +198,9 @@
   #mascot{width:84px;height:96px;transition:transform .25s,opacity .25s}
   #mascot.tuck{transform:translateX(46px);opacity:.75}
   #bubble{right:92px;bottom:calc(70px + env(safe-area-inset-bottom))}
+
+  .playall{margin-left:8px;border:0;background:var(--accent);color:#fff;border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;cursor:pointer;vertical-align:1px}
+  .intro{background:#fff8e1;border-radius:12px;padding:4px 12px 10px;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -548,6 +551,14 @@ function renderWeek(){
     h += '<div class="wcard' + (n === now ? ' now open' : '') + '" id="w' + n + '"><div class="whead" data-w="' + n + '">'
       + '<span class="wn">第 ' + n + ' 週｜' + esc(w.t) + '</span><span class="wd">' + wdate(i) + '</span>' + (n === now ? '<span class="now-tag">本週</span>' : '')
       + '<div class="wgoal">🎯 ' + esc(w.goal) + '</div><div class="wbar"><i id="wb' + n + '"></i></div></div><div class="wbody">';
+    if (n === 1 && typeof MY_INTRO !== 'undefined'){
+      h += '<h4>我的自我介紹 <button class="playall" type="button">▶ 全部播放</button></h4><div class="intro">';
+      MY_INTRO.forEach((l, j) => {
+        const k = '1i' + j;
+        h += '<label class="chk' + (wdone[k] ? ' done' : '') + '"><input type="checkbox" data-k="' + k + '"' + (wdone[k] ? ' checked' : '') + '><span class="ktext"><span class="kw" data-say="' + esc(l[0]) + '">' + esc(l[0]) + '</span><span class="kex kz">' + esc(l[1]) + '</span></span></label>';
+      });
+      h += '<p class="kz" style="font-size:13px;margin:6px 0 0">小提醒：「陳昱臻」照中文發音寫成 천위전；背熟每一句就打勾，最後試著不看稿說一遍並錄音。</p></div>';
+    }
     h += '<h4>必備句型</h4>';
     w.p.forEach((p, j) => {
       const k = n + 'p' + j;
@@ -564,11 +575,12 @@ function renderWeek(){
   WEEKS.forEach((w, i) => updBar(i + 1));
 }
 function updBar(n){
-  const w = WEEKS[n - 1], total = w.p.length + w.w.length;
-  let d = 0; w.p.forEach((_, j) => { if (wdone[n + 'p' + j]) d++; }); w.w.forEach((_, j) => { if (wdone[n + 'w' + j]) d++; });
+  const w = WEEKS[n - 1], intro = (n === 1 && typeof MY_INTRO !== 'undefined') ? MY_INTRO.length : 0, total = w.p.length + w.w.length + intro;
+  let d = 0; for (let j = 0; j < intro; j++) if (wdone['1i' + j]) d++; w.p.forEach((_, j) => { if (wdone[n + 'p' + j]) d++; }); w.w.forEach((_, j) => { if (wdone[n + 'w' + j]) d++; });
   const el = document.getElementById('wb' + n); if (el) el.style.width = Math.round(d / total * 100) + '%';
 }
 weekEl.addEventListener('click', e => {
+  if (e.target.closest('.playall')){ e.preventDefault(); e.stopPropagation(); speak(MY_INTRO.map(l => l[0]).join(' ')); return; }
   const say = e.target.closest('.kw'); if (say){ e.preventDefault(); speak(say.dataset.say || say.textContent, say); return; }
   const hd = e.target.closest('.whead'); if (hd) hd.parentNode.classList.toggle('open');
 });
