@@ -252,11 +252,11 @@
 
   <div id="cards">
     <div class="deckbar" id="decks"></div>
-    <div class="dirbar" id="dirs"><button data-d="ko">韓 → 中</button><button data-d="zh">中 → 韓</button><button data-d="both">中韓對照</button></div>
+    <div class="dirbar" id="dirs" style="display:none"><button data-d="ko">韓 → 中</button><button data-d="zh">中 → 韓</button><button data-d="both">中韓對照</button></div>
     <div class="card" id="card"><div class="front" id="cFront"></div><div class="back"><div class="meaning" id="cMeaning"></div><div class="extra" id="cExtra"></div></div></div>
     <div class="row"><button class="again" id="bAgain">再看一次</button><button class="know" id="bKnow">記住了 ✓</button></div>
     <div class="stat"><span id="cStat"></span><span><button id="bSpeak">🔊 發音</button> · <button id="bReset">重設進度</button></span></div>
-    <p class="hint">點卡片翻面看中文；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
+    <p class="hint">點卡片聽發音；「記住了」的字會從這一輪移出，進度存在這支手機的瀏覽器裡。</p>
   </div>
 </main>
 <div id="bubble"><div class="k" id="bK"></div><div class="z" id="bZ"></div></div>
@@ -508,13 +508,14 @@ function next(){
   $('cExtra').innerHTML = current.ex ? '<div class="kx">' + current.ex + '</div><div>' + (HANGUL.test(current.exZh) ? '' : current.exZh) + '</div>' : '';
   if (dir === 'both') $('card').classList.add('flipped');
 }
-let dir = store.get('ko-dir', 'ko');
+let dir = 'both'; // 單字卡固定中韓對照
 function drawDirs(){ document.querySelectorAll('#dirs button').forEach(b => b.classList.toggle('on', b.dataset.d === dir)); }
 document.querySelectorAll('#dirs button').forEach(b => b.onclick = () => { dir = b.dataset.d; store.set('ko-dir', dir); drawDirs(); if (current) queue.unshift(current); next(); });
 drawDirs();
 $('card').onclick = () => {
   if (!current) return;
   const c = $('card');
+  if (dir === 'both'){ speak(current.word); return; }
   if (!c.classList.contains('flipped')){ c.classList.add('flipped'); speak(current.word); }
   else speak(current.ex || current.word);
 };
