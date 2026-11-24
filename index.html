@@ -270,7 +270,7 @@ $('mCards').onclick = () => setMode(true);
 
 fetch('content.md', { cache: 'no-cache' })
   .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
-  .then(render)
+  .then(md => { render(md); if (/cards/.test(location.hash)) setMode(true); })
   .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
 </script>
 </body>
