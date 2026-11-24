@@ -133,7 +133,7 @@
   #bubble .k{font-family:"Jua","Noto Sans KR",sans-serif;font-weight:400;font-size:19px}
 
   /* verbs page */
-  .mode button{padding:6px 10px}
+  .mode button{padding:6px 8px;font-size:13px}
   #verbs h2{font-family:"Jua","Noto Sans TC",sans-serif;font-weight:400;font-size:24px;display:flex;align-items:center;gap:8px;color:#4a3a44;margin:30px 0 10px}
   .vchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
   .vchips a{font-family:"Noto Sans KR";font-size:14px;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ko);text-decoration:none}
@@ -148,6 +148,17 @@
   .vcard td.f{white-space:nowrap;font-weight:700}
   .vcard .m{font-size:12px;color:var(--muted);display:block;font-weight:400;font-family:"Noto Sans TC"}
   .vcard .zh{display:block;font-size:13px;color:var(--muted);font-family:"Noto Sans TC"}
+
+  #textbook h1{font-family:"Jua","Noto Sans TC";font-weight:400;font-size:24px;margin:18px 0 6px}
+  #textbook h2{font-family:"Jua","Noto Sans TC",sans-serif;font-weight:400;font-size:20px;color:#4a3a44;margin:26px 0 6px;scroll-margin-top:110px}
+  #textbook h2 + p{margin:0 0 6px;color:#d0607b}
+  .bchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .bchips a{font-size:13px;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink);text-decoration:none}
+  .bchips a:nth-child(odd){background:#ffe4ec}
+  .bchips a:nth-child(even){background:#e3eefc}
+
+  blockquote{margin:10px 0 12px;padding:10px 14px;background:#fff8e1;border-left:4px solid #ffd36e;border-radius:12px;color:#5a4a3a}
+  blockquote p{margin:4px 0}
 </style>
 </head>
 <body>
@@ -157,6 +168,7 @@
     <div class="mode">
       <button id="mNotes" class="on">筆記</button>
       <button id="mVerbs">動詞</button>
+      <button id="mBook">課本</button>
       <button id="mDaily">每日</button>
       <button id="mCards">單字卡</button>
     </div>
@@ -168,6 +180,7 @@
 <main>
   <div id="notes"><p class="hint">載入中…</p></div>
   <div id="verbs" style="display:none"></div>
+  <div id="textbook" style="display:none"></div>
   <div id="daily" style="display:none"><p class="hint">載入中…</p></div>
 
   <div id="cards">
@@ -333,6 +346,7 @@ function buildDecks(){
     });
   });
   if (dcards.length) decks.unshift({ title: '每日單字', cards: dcards });
+  if (typeof bookDecks === 'function') decks.push(...bookDecks());
 }
 
 function render(md){
@@ -461,6 +475,38 @@ $('mascot').onclick = () => {
 setTimeout(() => say(GREETING, true), 700);
 
 
+
+/* ---------- textbook page ---------- */
+const bookEl = document.getElementById('textbook');
+function renderBook(md){
+  bookEl.innerHTML = marked.parse(md);
+  const lessons = {};
+  bookEl.querySelectorAll('h2').forEach((h, i) => {
+    h.id = 'd' + (i + 1);
+    const m = h.textContent.match(/｜(1[AB] 第\d+課)｜/);
+    if (m && !lessons[m[1]]) lessons[m[1]] = h.id;
+  });
+  const nav = document.createElement('div'); nav.className = 'bchips';
+  nav.innerHTML = Object.entries(lessons).map(([k, id]) => '<a href="#' + id + '">' + k + '</a>').join('');
+  const h1 = bookEl.querySelector('h1'); (h1 ? h1.after(nav) : bookEl.prepend(nav));
+  bookEl.querySelectorAll('table').forEach(t => { const w = document.createElement('div'); w.className = 'tablewrap'; t.parentNode.insertBefore(w, t); w.appendChild(t); });
+  bookEl.querySelectorAll('td').forEach(td => { if (HANGUL.test(td.textContent)) td.classList.add('ko'); });
+}
+bookEl.addEventListener('click', e => { const td = e.target.closest('td.ko'); if (td) speak(td.textContent, td); });
+function bookDecks(){
+  const out = {}; let cur = null;
+  bookEl.querySelectorAll('h2, table').forEach(el => {
+    if (el.tagName === 'H2'){ const m = el.textContent.match(/｜(1[AB] 第\d+課)｜/); cur = m ? m[1] : null; return; }
+    if (!cur) return;
+    el.querySelectorAll('tbody tr').forEach(tr => {
+      const t = [...tr.children].map(td => td.textContent.trim());
+      (out[cur] = out[cur] || []);
+      if (t[0] && !out[cur].some(c => c.word === t[0])) out[cur].push({ word: t[0], meaning: t[1], ex: t[2] || '', exZh: '' });
+    });
+  });
+  return Object.entries(out).map(([k, cards]) => ({ title: '課本 ' + k, cards }));
+}
+
 /* ---------- verbs page ---------- */
 const verbsEl = document.getElementById('verbs');
 function esc(t){ return t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -491,6 +537,7 @@ verbsEl.addEventListener('click', e => {
 /* ---------- mode switch ---------- */
 function setMode(m){
   if (m === true) m = 'cards'; if (m === false) m = 'notes';
+  $('mBook').classList.toggle('on', m === 'book'); bookEl.style.display = m === 'book' ? '' : 'none';
   $('mVerbs').classList.toggle('on', m === 'verbs'); verbsEl.style.display = m === 'verbs' ? '' : 'none';
   $('mNotes').classList.toggle('on', m === 'notes'); $('mDaily').classList.toggle('on', m === 'daily'); $('mCards').classList.toggle('on', m === 'cards');
   notes.style.display = m === 'notes' ? '' : 'none'; daily.style.display = m === 'daily' ? '' : 'none';
@@ -501,15 +548,17 @@ function setMode(m){
 $('mNotes').onclick = () => setMode('notes');
 $('mDaily').onclick = () => setMode('daily');
 $('mVerbs').onclick = () => setMode('verbs');
+$('mBook').onclick = () => setMode('book');
 $('mCards').onclick = () => setMode('cards');
 
 const get = f => fetch(f, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
-Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。')])
-  .then(([md, dmd]) => {
-    renderDaily(dmd); render(md); renderVerbs();
+Promise.all([get('content.md'), get('daily.md').catch(() => '# 每日課程\n\n還沒有課程。'), get('textbook.md').catch(() => '')])
+  .then(([md, dmd, bmd]) => {
+    renderDaily(dmd); renderBook(bmd); render(md); renderVerbs();
     if (/cards/.test(location.hash)) setMode('cards');
     else if (/daily/.test(location.hash)) setMode('daily');
     else if (/verbs/.test(location.hash)) setMode('verbs');
+    else if (/book/.test(location.hash)) setMode('book');
   })
   .catch(() => { notes.innerHTML = '<p>找不到 content.md。請確認它和 index.html 放在同一個資料夾。</p>'; });
 </script>
